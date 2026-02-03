@@ -6,11 +6,8 @@
     <title>PRO recruitment | Future Tech</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
     <script>
@@ -98,6 +95,12 @@
 
         .modal { display: none; position: fixed; inset: 0; z-index: 100; background-color: rgba(0,0,0,0.95); backdrop-filter: blur(5px); align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease; }
         .modal.open { display: flex; opacity: 1; }
+        
+        /* Utility classes for toggling views */
+        .view-hidden { display: none !important; }
+        .view-visible { display: block !important; animation: fadeIn 0.5s ease-out; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="bg-tech-pattern flex flex-col min-h-screen">
@@ -105,7 +108,7 @@
     <nav class="fixed top-0 w-full z-50 glass-panel">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16 md:h-20 items-center">
-                <div class="flex items-center gap-3 z-50 cursor-pointer" onclick="scrollToId('hero')">
+                <div class="flex items-center gap-3 z-50 cursor-pointer" onclick="resetToHubs()">
                     <div class="w-10 h-10 border border-accent/20 bg-accent/5 rounded flex items-center justify-center text-accent font-bold font-display text-xl">P</div>
                     <div class="flex flex-col">
                         <span class="font-display font-bold text-lg md:text-xl text-white tracking-wide leading-none">PRO Recruitment</span>
@@ -113,9 +116,9 @@
                     </div>
                 </div>
                 <div class="hidden md:flex space-x-10 text-sm font-medium text-gray-400">
-                    <button onclick="scrollToId('about')" class="hover:text-accent transition-colors uppercase tracking-wider text-xs">Про нас</button>
-                    <button onclick="scrollToId('charts')" class="hover:text-accent transition-colors uppercase tracking-wider text-xs">Аналітика</button>
-                    <button onclick="scrollToId('vacancies')" class="hover:text-accent transition-colors uppercase tracking-wider text-xs">Вакансії</button>
+                    <button onclick="mobileScroll('about')" class="hover:text-accent transition-colors uppercase tracking-wider text-xs">Про нас</button>
+                    <button onclick="mobileScroll('charts')" class="hover:text-accent transition-colors uppercase tracking-wider text-xs">Аналітика</button>
+                    <button onclick="resetToHubs(); scrollToId('jobs-container')" class="hover:text-accent transition-colors uppercase tracking-wider text-xs">Вакансії</button>
                 </div>
                 <div class="hidden md:block">
                     <button onclick="scrollToId('contact')" class="px-6 py-2 bg-accent text-black font-bold text-xs uppercase tracking-wider hover:bg-white transition-all duration-300">Зв'язатися</button>
@@ -129,7 +132,7 @@
             <div class="px-4 pt-2 pb-6 space-y-1">
                 <button onclick="mobileScroll('about')" class="block w-full text-left px-3 py-4 border-b border-white/5 text-gray-400 hover:text-accent font-display uppercase tracking-wider text-sm">Про нас</button>
                 <button onclick="mobileScroll('charts')" class="block w-full text-left px-3 py-4 border-b border-white/5 text-gray-400 hover:text-accent font-display uppercase tracking-wider text-sm">Аналітика</button>
-                <button onclick="mobileScroll('vacancies')" class="block w-full text-left px-3 py-4 border-b border-white/5 text-gray-400 hover:text-accent font-display uppercase tracking-wider text-sm">Вакансії</button>
+                <button onclick="resetToHubs(); mobileScroll('jobs-container')" class="block w-full text-left px-3 py-4 border-b border-white/5 text-gray-400 hover:text-accent font-display uppercase tracking-wider text-sm">Вакансії</button>
                 <button onclick="mobileScroll('contact')" class="w-full text-left mt-4 px-3 py-4 bg-white/5 text-accent font-bold border border-accent/20 font-display uppercase tracking-wider text-sm">Залишити заявку</button>
             </div>
         </div>
@@ -153,7 +156,7 @@
                 Зараз найкращий час капіталізувати свої навички.
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center sm:justify-start w-full sm:w-auto">
-                <button onclick="scrollToId('locations')" class="w-full sm:w-auto group px-8 py-4 bg-accent text-black font-bold font-display uppercase tracking-wider hover:bg-white transition-all shadow-[0_0_20px_rgba(219,225,32,0.2)] flex items-center justify-center gap-3">
+                <button onclick="resetToHubs(); scrollToId('jobs-container')" class="w-full sm:w-auto group px-8 py-4 bg-accent text-black font-bold font-display uppercase tracking-wider hover:bg-white transition-all shadow-[0_0_20px_rgba(219,225,32,0.2)] flex items-center justify-center gap-3">
                     Обрати місто <i class="fa-solid fa-city"></i>
                 </button>
                 <button onclick="scrollToId('charts')" class="w-full sm:w-auto px-8 py-4 bg-transparent border border-white/20 text-white font-bold font-display uppercase tracking-wider hover:border-accent hover:text-accent transition-colors">
@@ -227,7 +230,6 @@
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                
                 <div class="glass-panel p-6 md:p-8 border border-white/10 rounded-lg reveal flex flex-col">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                         <h3 class="text-white font-display font-bold uppercase text-sm">Динаміка Зарплат (грн)</h3>
@@ -242,7 +244,6 @@
                     </div>
                     <p class="text-xs text-gray-500 mt-4 text-center">*Дані агреговано з work.ua, robota.ua станом на Січень 2026</p>
                 </div>
-
                 <div class="glass-panel p-6 md:p-8 border border-white/10 rounded-lg reveal delay-100 flex flex-col">
                     <div class="flex justify-between items-end mb-6">
                         <div>
@@ -256,83 +257,63 @@
                     </div>
                     <p class="text-xs text-gray-500 mt-4 text-center">Країні бракує саме <span class="text-accent">ваших</span> навичок.</p>
                 </div>
-
             </div>
         </div>
     </section>
 
-    <section id="locations" class="py-24 relative bg-dark-bg border-t border-white/5">
+    <section id="jobs-container" class="py-24 relative bg-dark-bg border-t border-white/5 min-h-[800px]">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16 reveal">
-                <h2 class="text-3xl md:text-4xl font-display font-bold text-white uppercase tracking-tight mb-2">Наші Хаби</h2>
-                <p class="text-gray-500">Оберіть місто для перегляду локальних вакансій.</p>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 reveal delay-100">
-                <div onclick="openCityModal('Kyiv')" class="city-card bg-white/5 border border-white/10 rounded-lg p-6 cursor-pointer flex flex-col items-center text-center group relative overflow-hidden">
-                    <div class="w-16 h-16 bg-black rounded-full flex items-center justify-center mb-4 border border-white/10 group-hover:border-accent transition-colors city-icon"><i class="fa-solid fa-monument text-2xl text-gray-400 transition-colors"></i></div>
-                    <h3 class="text-xl font-bold text-white mb-1">Київ</h3>
-                    <span class="text-xs text-accent uppercase tracking-widest font-bold"><span id="count-kyiv">0</span> Вакансій</span>
-                </div>
-                <div onclick="openCityModal('Lviv')" class="city-card bg-white/5 border border-white/10 rounded-lg p-6 cursor-pointer flex flex-col items-center text-center group relative overflow-hidden">
-                    <div class="w-16 h-16 bg-black rounded-full flex items-center justify-center mb-4 border border-white/10 group-hover:border-accent transition-colors city-icon"><i class="fa-solid fa-mug-hot text-2xl text-gray-400 transition-colors"></i></div>
-                    <h3 class="text-xl font-bold text-white mb-1">Львів</h3>
-                    <span class="text-xs text-accent uppercase tracking-widest font-bold"><span id="count-lviv">0</span> Вакансій</span>
-                </div>
-                <div onclick="openCityModal('Dnipro')" class="city-card bg-white/5 border border-white/10 rounded-lg p-6 cursor-pointer flex flex-col items-center text-center group relative overflow-hidden">
-                    <div class="w-16 h-16 bg-black rounded-full flex items-center justify-center mb-4 border border-white/10 group-hover:border-accent transition-colors city-icon"><i class="fa-solid fa-rocket text-2xl text-gray-400 transition-colors"></i></div>
-                    <h3 class="text-xl font-bold text-white mb-1">Дніпро</h3>
-                    <span class="text-xs text-accent uppercase tracking-widest font-bold"><span id="count-dnipro">0</span> Вакансій</span>
-                </div>
-                <div onclick="openCityModal('Kharkiv')" class="city-card bg-white/5 border border-white/10 rounded-lg p-6 cursor-pointer flex flex-col items-center text-center group relative overflow-hidden">
-                    <div class="w-16 h-16 bg-black rounded-full flex items-center justify-center mb-4 border border-white/10 group-hover:border-accent transition-colors city-icon"><i class="fa-solid fa-atom text-2xl text-gray-400 transition-colors"></i></div>
-                    <h3 class="text-xl font-bold text-white mb-1">Харків</h3>
-                    <span class="text-xs text-accent uppercase tracking-widest font-bold"><span id="count-kharkiv">0</span> Вакансій</span>
-                </div>
-                <div onclick="openCityModal('Odesa')" class="city-card bg-white/5 border border-white/10 rounded-lg p-6 cursor-pointer flex flex-col items-center text-center group relative overflow-hidden">
-                    <div class="w-16 h-16 bg-black rounded-full flex items-center justify-center mb-4 border border-white/10 group-hover:border-accent transition-colors city-icon"><i class="fa-solid fa-anchor text-2xl text-gray-400 transition-colors"></i></div>
-                    <h3 class="text-xl font-bold text-white mb-1">Одеса</h3>
-                    <span class="text-xs text-accent uppercase tracking-widest font-bold"><span id="count-odesa">0</span> Вакансій</span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="vacancies" class="py-24 relative">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 border-b border-white/10 pb-8 gap-6 reveal">
-                <div>
-                    <h2 class="text-3xl md:text-4xl font-display font-bold text-white uppercase tracking-tight mb-2">Всі Вакансії</h2>
-                    <p class="text-gray-500">Натисніть на картку для перегляду умов.</p>
-                </div>
-                
-                <div class="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-                    <div class="relative">
-                        <select id="cityFilter" onchange="applyFilters()" class="appearance-none w-full sm:w-48 bg-black border border-white/10 text-white py-2 px-4 pr-8 rounded text-xs font-bold uppercase tracking-wider cursor-pointer hover:border-accent transition-colors">
-                            <option value="all">Всі Міста</option>
-                            <option value="Kyiv">Київ</option>
-                            <option value="Lviv">Львів</option>
-                            <option value="Dnipro">Дніпро</option>
-                            <option value="Kharkiv">Харків</option>
-                            <option value="Odesa">Одеса</option>
-                        </select>
-                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-accent"><i class="fa-solid fa-chevron-down text-xs"></i></div>
-                    </div>
-                    <div class="flex gap-2 overflow-x-auto pb-2 sm:pb-0 scrollbar-hide">
-                        <button onclick="setCategory('all')" class="filter-btn active px-4 py-2 text-xs font-bold uppercase tracking-wider border border-accent bg-accent text-black transition whitespace-nowrap" data-cat="all">Всі</button>
-                        <button onclick="setCategory('production')" class="filter-btn px-4 py-2 text-xs font-bold uppercase tracking-wider border border-white/10 text-gray-400 hover:border-accent hover:text-accent transition whitespace-nowrap" data-cat="production">Виробництво</button>
-                        <button onclick="setCategory('engineering')" class="filter-btn px-4 py-2 text-xs font-bold uppercase tracking-wider border border-white/10 text-gray-400 hover:border-accent hover:text-accent transition whitespace-nowrap" data-cat="engineering">Інженерія</button>
-                    </div>
-                </div>
-            </div>
-
-            <div id="job-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                </div>
             
-            <div id="no-jobs-msg" class="hidden py-20 text-center border border-dashed border-white/10 rounded">
-                <i class="fa-solid fa-layer-group text-4xl text-gray-700 mb-4"></i>
-                <p class="text-gray-500 mt-2">Вакансії за вашим запитом не знайдені.</p>
+            <div id="hubs-view" class="view-visible">
+                <div class="text-center mb-16 reveal">
+                    <h2 class="text-3xl md:text-4xl font-display font-bold text-white uppercase tracking-tight mb-2">Наші Хаби</h2>
+                    <p class="text-gray-500">Оберіть місто для перегляду вакансій.</p>
+                </div>
+                <div id="locations-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 reveal delay-100">
+                    </div>
+                
+                <div class="mt-16 text-center">
+                    <button onclick="switchToVacancies('all')" class="text-sm text-gray-400 hover:text-accent underline underline-offset-4 decoration-accent/30 hover:decoration-accent transition-all">Переглянути всі вакансії без фільтрації</button>
+                </div>
             </div>
+
+            <div id="vacancies-view" class="view-hidden">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 border-b border-white/10 pb-6 gap-6">
+                    <div>
+                        <button onclick="resetToHubs()" class="text-[10px] font-bold uppercase tracking-widest text-accent mb-2 hover:text-white transition flex items-center gap-2">
+                            <i class="fa-solid fa-arrow-left"></i> Назад до хабів
+                        </button>
+                        <h2 class="text-3xl md:text-4xl font-display font-bold text-white uppercase tracking-tight">Вакансії</h2>
+                    </div>
+                    
+                    <div class="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+                        <div class="relative w-full sm:w-48">
+                            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Місто</label>
+                            <select id="cityFilter" onchange="applyFilters()" class="appearance-none w-full bg-black border border-white/10 text-white py-2 px-4 pr-8 rounded text-xs font-bold uppercase tracking-wider cursor-pointer hover:border-accent transition-colors">
+                                <option value="all">Всі Міста</option>
+                                </select>
+                            <div class="pointer-events-none absolute bottom-2 right-0 flex items-center px-2 text-accent"><i class="fa-solid fa-chevron-down text-xs"></i></div>
+                        </div>
+
+                        <div class="relative w-full sm:w-48">
+                            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Категорія</label>
+                            <select id="catFilter" onchange="applyFilters()" class="appearance-none w-full bg-black border border-white/10 text-white py-2 px-4 pr-8 rounded text-xs font-bold uppercase tracking-wider cursor-pointer hover:border-accent transition-colors">
+                                <option value="all">Всі Категорії</option>
+                                </select>
+                            <div class="pointer-events-none absolute bottom-2 right-0 flex items-center px-2 text-accent"><i class="fa-solid fa-chevron-down text-xs"></i></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="job-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    </div>
+                
+                <div id="no-jobs-msg" class="hidden py-20 text-center border border-dashed border-white/10 rounded">
+                    <i class="fa-solid fa-layer-group text-4xl text-gray-700 mb-4"></i>
+                    <p class="text-gray-500 mt-2">Вакансії за вашим запитом не знайдені.</p>
+                </div>
+            </div>
+
         </div>
     </section>
 
@@ -431,23 +412,12 @@
         </div>
     </div>
 
-    <div id="cityModal" class="modal">
-        <div class="modal-content bg-dark-card w-full max-w-2xl mx-4 border border-white/10 shadow-[0_0_50px_rgba(219,225,32,0.1)] relative flex flex-col max-h-[85vh]">
-            <div class="p-6 border-b border-white/10 flex justify-between items-center bg-black/50">
-                <div><h3 class="text-xl font-display font-bold text-white uppercase"><i class="fa-solid fa-location-dot text-accent mr-2"></i> Вакансії: <span id="cityModalName" class="text-accent">City</span></h3></div>
-                <button onclick="closeCityModal()" class="text-gray-500 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
-            <div class="p-6 overflow-y-auto custom-scroll flex-1" id="cityJobList"></div>
-            <div class="p-4 border-t border-white/10 bg-black/50 text-center">
-                <button onclick="closeCityModal(); scrollToId('vacancies')" class="text-xs text-accent hover:underline uppercase tracking-wider">Переглянути всі вакансії</button>
-            </div>
-        </div>
-    </div>
-
     <div id="toast" class="fixed bottom-8 left-1/2 transform -translate-x-1/2 md:left-auto md:right-8 md:translate-x-0 bg-dark-card border border-accent/30 text-white px-6 py-4 translate-y-40 transition-transform duration-300 z-[200] flex items-center shadow-[0_0_20px_rgba(219,225,32,0.1)] w-auto rounded-full">
         <span class="w-2 h-2 bg-accent rounded-full mr-3 animate-pulse"></span>
         <p class="text-xs font-mono uppercase" id="toastMsg">Completed.</p>
     </div>
+
+    <script src="jobs.js"></script> 
 
     <script>
         // --- SCROLLING ---
@@ -513,110 +483,180 @@
         }
         window.addEventListener('resize', () => { resizeCanvas(); initParticles(); });
 
-        // --- DATA (STATIC) ---
-        const jobs = [
-            { 
-                id: 1, title: "Начальник ВТВ", cat: "management", city: "Kyiv", icon: "fa-user-tie", feat: true, desc: "Керування якістю. Впровадження ISO 9001.",
-                modalData: {
-                    offer: ["ЗП від 60 000 грн + бонуси KPI", "Бронювання та офіційне оформлення", "Службовий транспорт", "Медичне страхування"],
-                    tasks: ["Організація роботи відділу технічного контролю", "Розробка та впровадження стандартів якості", "Аналіз рекламацій та причин браку", "Проведення внутрішніх аудитів"],
-                    candidate: "Маєш досвід керування ВТК від 3 років, знаєш ISO 9001 та вмієш будувати процеси."
-                }
-            },
-            { 
-                id: 2, title: "Програміст ЧПК", cat: "engineering", city: "Lviv", icon: "fa-code", feat: true, desc: "Робота з G-code, Siemens NX, Fanuc.",
-                modalData: {
-                    offer: ["ЗП від 50 000 грн", "Бронювання з першого дня", "Сучасне обладнання (DMG Mori)", "Компенсація житла при переїзді"],
-                    tasks: ["Розробка керуючих програм (токарна/фрезерна група)", "Підбір інструменту та режимів різання", "Впровадження нових деталей у виробництво", "Оптимізація часу обробки"],
-                    candidate: "Знаєш G-code, CAM-системи (NX/SolidCAM) та маєш досвід роботи з металом."
-                }
-            },
-            { 
-                id: 3, title: "Монтажник РЕА", cat: "production", city: "Dnipro", icon: "fa-microchip", feat: true, desc: "Пайка плат, складання вузлів.",
-                modalData: {
-                    offer: ["ЗП від 40 000 грн + виробіток", "Бронювання та соцпакет", "Безкоштовні обіди", "Графік 5/2, 08:00–17:00"],
-                    tasks: ["Пайка SMD компонентів під мікроскопом", "В'язка джгутів та кабельних збірок", "Механічне складання блоків", "Контроль якості пайки"],
-                    candidate: "Маєш «тверду руку», хороший зір та вмієш читати схеми (або хочеш навчитися)."
-                }
-            },
-            { 
-                id: 4, title: "Оператор верстатів", cat: "production", city: "Kharkiv", icon: "fa-industry", feat: false, desc: "Контроль роботи обладнання.",
-                modalData: {
-                    offer: ["ЗП від 35 000 грн", "Бронювання", "Навчання на робочому місці", "Змінний графік 2/2"],
-                    tasks: ["Встановлення заготовок та зняття деталей", "Контроль розмірів мікрометром/штангенциркулем", "Заміна пластин та інструменту", "Підтримка чистоти верстату"],
-                    candidate: "Відповідальний, уважний до деталей та готовий працювати з «залізом»."
-                }
-            },
-            { 
-                id: 5, title: "Інженер-конструктор", cat: "engineering", city: "Kyiv", icon: "fa-robot", feat: false, desc: "Проектування роботизованих систем.",
-                modalData: {
-                    offer: ["ЗП від 55 000 грн", "Бронювання", "Цікаві R&D проекти", "Можливість віддаленої роботи (гібрид)"],
-                    tasks: ["Розробка 3D моделей та креслень (SolidWorks)", "Проектування вузлів автоматизації", "Супровід виготовлення дослідних зразків", "Складання специфікацій"],
-                    candidate: "Маєш вищу технічну освіту та портфоліо проектів у машинобудуванні."
-                }
-            },
-            {
-                id: 6, title: "Логіст", cat: "management", city: "Odesa", icon: "fa-box", feat: false, desc: "Управління складськими запасами.",
-                modalData: {
-                    offer: ["ЗП від 30 000 грн", "Офіційне працевлаштування", "Корпоративний зв'язок"],
-                    tasks: ["Облік приходу/витрат матеріалів в 1С", "Організація адресатного зберігання", "Комплектація замовлень на виробництво", "Проведення інвентаризацій"],
-                    candidate: "Уважний, системний, маєш досвід роботи в складській логістиці."
-                }
-            },
-            {
-                id: 7, title: "Енергетик", cat: "engineering", city: "Dnipro", icon: "fa-bolt", feat: false, desc: "Обслуговування електромереж.",
-                modalData: {
-                    offer: ["ЗП від 45 000 грн", "Бронювання", "Спецодяг та інструмент", "Страхування життя"],
-                    tasks: ["Забезпечення безперебійного електропостачання", "Обслуговування щитових та трансформаторів", "Підключення нового обладнання", "Ведення технічної документації"],
-                    candidate: "Маєш профільну освіту, групу допуску IV-V та досвід на виробництві."
-                }
-            },
-            {
-                id: 8, title: "QA Manager", cat: "management", city: "Lviv", icon: "fa-list-check", feat: false, desc: "Контроль якості продукції.",
-                modalData: {
-                    offer: ["ЗП від 40 000 грн", "Навчання та сертифікація", "Сучасна лабораторія"],
-                    tasks: ["Вхідний контроль матеріалів та комплектуючих", "Міжопераційний контроль на лінії", "Фінальна перевірка виробів", "Оформлення паспортів якості"],
-                    candidate: "Уважний до деталей, принциповий у питаннях якості, вмієш користуватися вимірювальним інструментом."
-                }
-            },
-            {
-                id: 9, title: "Оператор 3D принтера", cat: "production", city: "Kyiv", icon: "fa-cube", feat: true, desc: "Друк прототипів.",
-                modalData: {
-                    offer: ["ЗП від 35 000 грн", "Робота з передовими технологіями", "Гнучкий графік"],
-                    tasks: ["Підготовка моделей до друку (слайсинг)", "Обслуговування принтерів (FDM/SLA)", "Пост-обробка деталей (шліфування, фарбування)", "Контроль витратних матеріалів"],
-                    candidate: "Технічно грамотний, цікавишся адитивними технологіями, готовий навчатися."
-                }
-            },
-            {
-                id: 10, title: "Embedded C++", cat: "engineering", city: "Kharkiv", icon: "fa-microchip", feat: true, desc: "Розробка ПЗ для мікроконтролерів.",
-                modalData: {
-                    offer: ["ЗП від 80 000 грн", "Бронювання", "Relocation package", "Участь у Defense Tech проектах"],
-                    tasks: ["Розробка прошивок для STM32/ESP32", "Робота з інтерфейсами (SPI, I2C, UART, CAN)", "Написання драйверів периферії", "Відлагодження на «залізі»"],
-                    candidate: "Маєш досвід Embedded C/C++, розумієш схемотехніку та принципи RTOS."
-                }
-            }
-        ];
-        
         let currentFilter = { cat: 'all', city: 'all' };
 
-        // --- FILTER & RENDER ---
-        function setCategory(cat) {
-            currentFilter.cat = cat;
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                const isActive = btn.getAttribute('data-cat') === cat;
-                btn.className = isActive ? 'filter-btn active px-4 py-2 text-xs font-bold uppercase tracking-wider border border-accent bg-accent text-black transition whitespace-nowrap' : 'filter-btn px-4 py-2 text-xs font-bold uppercase tracking-wider border border-white/10 text-gray-400 hover:border-accent hover:text-accent transition whitespace-nowrap';
-            });
+        // --- CONFIG & MAPPING ---
+        const cityConfig = {
+            // --- Мільйонники та основні хаби ---
+            'Kyiv': { name: 'Київ', icon: 'fa-monument' },
+            'Lviv': { name: 'Львів', icon: 'fa-mug-hot' },
+            'Dnipro': { name: 'Дніпро', icon: 'fa-rocket' },
+            'Kharkiv': { name: 'Харків', icon: 'fa-atom' },
+            'Odesa': { name: 'Одеса', icon: 'fa-anchor' },
+            'Zaporizhzhia': { name: 'Запоріжжя', icon: 'fa-bolt' },
+
+            // --- Західна Україна ---
+            'Chernivtsi': { name: 'Чернівці', icon: 'fa-building-columns' },
+            'Uzhhorod': { name: 'Ужгород', icon: 'fa-mountain' },
+            'Ternopil': { name: 'Тернопіль', icon: 'fa-sailboat' },
+            'Ivano-Frankivsk': { name: 'Івано-Франківськ', icon: 'fa-tree' },
+            'Rivne': { name: 'Рівне', icon: 'fa-leaf' },
+            'Lutsk': { name: 'Луцьк', icon: 'fa-chess-rook' },
+            'Khmelnytskyi': { name: 'Хмельницький', icon: 'fa-shop' },
+            'Mukachevo': { name: 'Мукачево', icon: 'fa-wine-glass' },
+            'Drohobych': { name: 'Дрогобич', icon: 'fa-industry' },
+            'Kamianets-Podilskyi': { name: 'Кам\'янець-Подільський', icon: 'fa-fort-awesome' },
+
+            // --- Центр та Північ ---
+            'Vinnytsia': { name: 'Вінниця', icon: 'fa-bus' },
+            'Poltava': { name: 'Полтава', icon: 'fa-landmark' },
+            'Zhytomyr': { name: 'Житомир', icon: 'fa-rocket' },
+            'Cherkasy': { name: 'Черкаси', icon: 'fa-water' },
+            'Chernihiv': { name: 'Чернігів', icon: 'fa-church' },
+            'Sumy': { name: 'Суми', icon: 'fa-bag-shopping' },
+            'Kropyvnytskyi': { name: 'Кропивницький', icon: 'fa-masks-theater' },
+            'Bila Tserkva': { name: 'Біла Церква', icon: 'fa-tree' },
+
+            // --- Південь та Схід ---
+            'Mykolaiv': { name: 'Миколаїв', icon: 'fa-ship' },
+            'Kherson': { name: 'Херсон', icon: 'fa-sun' },
+            'Kryvyi Rih': { name: 'Кривий Ріг', icon: 'fa-industry' },
+            'Kremenchuk': { name: 'Кременчук', icon: 'fa-train' },
+            'Mariupol': { name: 'Маріуполь', icon: 'fa-anchor' }
+        };
+
+        // Mapping for category names (fallback to original name if not found)
+        const catMapping = {
+            'production': 'Виробництво',
+            'engineering': 'Інженерія',
+            'management': 'Менеджмент',
+            'it': 'IT / Розробка',
+            'admin': 'Адміністрація'
+        };
+
+        // --- INITIALIZATION ---
+        function initData() {
+            if (typeof jobs === 'undefined') { console.error('jobs.js not loaded'); return; }
+            
+            // 1. Render Hubs
+            renderHubs();
+            
+            // 2. Init Dynamic Filters (Cities & Categories)
+            initDynamicFilters();
+            
+            // 3. Render Jobs (Initially hidden or shown if pre-filtered? Default is Hubs view)
             renderJobs();
         }
-        function applyFilters() { currentFilter.city = document.getElementById('cityFilter').value; renderJobs(); }
+
+        function renderHubs() {
+            const uniqueCities = [...new Set(jobs.map(job => job.city))];
+            const counts = {}; 
+            jobs.forEach(j => { counts[j.city] = (counts[j.city] || 0) + 1; });
+
+            const container = document.getElementById('locations-grid');
+            if(container) {
+                container.innerHTML = '';
+                uniqueCities.forEach(cityKey => {
+                    const conf = cityConfig[cityKey] || { name: cityKey, icon: 'fa-city' };
+                    const count = counts[cityKey] || 0;
+
+                    container.innerHTML += `
+                    <div onclick="switchToVacancies('${cityKey}')" class="city-card bg-white/5 border border-white/10 rounded-lg p-6 cursor-pointer flex flex-col items-center text-center group relative overflow-hidden">
+                        <div class="w-16 h-16 bg-black rounded-full flex items-center justify-center mb-4 border border-white/10 group-hover:border-accent transition-colors city-icon">
+                            <i class="fa-solid ${conf.icon} text-2xl text-gray-400 transition-colors"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-1">${conf.name}</h3>
+                        <span class="text-xs text-accent uppercase tracking-widest font-bold">${count} Вакансій</span>
+                    </div>
+                    `;
+                });
+            }
+        }
+
+        function initDynamicFilters() {
+            const citySelect = document.getElementById('cityFilter');
+            const catSelect = document.getElementById('catFilter');
+            
+            // Unique Cities & Categories
+            const uniqueCities = [...new Set(jobs.map(job => job.city))].sort();
+            const uniqueCats = [...new Set(jobs.map(job => job.cat))].sort();
+
+            // Populate Cities
+            uniqueCities.forEach(city => {
+                const conf = cityConfig[city] || { name: city };
+                const option = document.createElement('option');
+                option.value = city;
+                option.textContent = conf.name;
+                citySelect.appendChild(option);
+            });
+
+            // Populate Categories
+            uniqueCats.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat;
+                option.textContent = catMapping[cat] || cat; // Use mapping or raw
+                catSelect.appendChild(option);
+            });
+        }
+
+        // --- VIEW SWITCHING LOGIC ---
+        function switchToVacancies(cityPreselect = 'all') {
+            const hubsView = document.getElementById('hubs-view');
+            const vacanciesView = document.getElementById('vacancies-view');
+            const cityFilter = document.getElementById('cityFilter');
+            
+            // Switch Views
+            hubsView.classList.remove('view-visible');
+            hubsView.classList.add('view-hidden');
+            
+            vacanciesView.classList.remove('view-hidden');
+            vacanciesView.classList.add('view-visible');
+            
+            // Set Filter
+            cityFilter.value = cityPreselect;
+            currentFilter.city = cityPreselect;
+            
+            // Render
+            renderJobs();
+            
+            // Scroll slightly to ensure visibility
+            scrollToId('jobs-container');
+        }
+
+        function resetToHubs() {
+            const hubsView = document.getElementById('hubs-view');
+            const vacanciesView = document.getElementById('vacancies-view');
+            
+            // Reset Filters
+            document.getElementById('cityFilter').value = 'all';
+            document.getElementById('catFilter').value = 'all';
+            currentFilter = { cat: 'all', city: 'all' };
+            
+            // Switch Views
+            vacanciesView.classList.remove('view-visible');
+            vacanciesView.classList.add('view-hidden');
+            
+            hubsView.classList.remove('view-hidden');
+            hubsView.classList.add('view-visible');
+        }
+
+        function applyFilters() { 
+            currentFilter.city = document.getElementById('cityFilter').value; 
+            currentFilter.cat = document.getElementById('catFilter').value;
+            renderJobs(); 
+        }
         
         function renderJobs() {
+            if (typeof jobs === 'undefined') return;
             const grid = document.getElementById('job-grid');
             const noMsg = document.getElementById('no-jobs-msg');
-            grid.innerHTML = ''; let count = 0;
+            grid.innerHTML = ''; 
+            let count = 0;
+            
             jobs.forEach(job => {
                 const catMatch = currentFilter.cat === 'all' || job.cat === currentFilter.cat;
                 const cityMatch = currentFilter.city === 'all' || job.city === currentFilter.city;
+                
                 if (catMatch && cityMatch) {
                     count++;
                     const card = document.createElement('div');
@@ -627,6 +667,7 @@
                             <i class="fa-solid ${job.icon} text-4xl text-gray-500 group-hover:text-accent transition-colors drop-shadow-[0_0_5px_rgba(219,225,32,0.1)]"></i>
                             <div class="flex flex-col items-end gap-2">
                                 ${job.feat ? '<span class="text-[10px] font-bold uppercase tracking-widest text-accent border border-accent/30 px-2 py-1 rounded">Hot</span>' : ''}
+                                ${job.booking ? '<span class="text-[10px] font-bold uppercase tracking-widest text-green-400 border border-green-400/30 px-2 py-1 rounded flex items-center gap-1"><i class="fa-solid fa-shield-halved"></i> Бронь</span>' : ''}
                                 <span class="text-[10px] text-gray-400 border border-white/10 px-2 py-1 rounded flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> ${job.city}</span>
                             </div>
                         </div>
@@ -642,47 +683,20 @@
                     grid.appendChild(card);
                 }
             });
+            
             if(count === 0) noMsg.classList.remove('hidden'); else noMsg.classList.add('hidden');
             document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
         }
 
-        // --- CITY LOGIC ---
-        function updateCityCounts() {
-            const counts = {}; jobs.forEach(j => { counts[j.city] = (counts[j.city] || 0) + 1; });
-            ['Kyiv', 'Lviv', 'Dnipro', 'Kharkiv', 'Odesa'].forEach(city => {
-                const el = document.getElementById(`count-${city.toLowerCase()}`); if(el) el.textContent = counts[city] || 0;
-            });
-        }
-        function openCityModal(city) {
-            const modal = document.getElementById('cityModal'); document.getElementById('cityModalName').textContent = city;
-            const list = document.getElementById('cityJobList'); list.innerHTML = '';
-            const cityJobs = jobs.filter(j => j.city === city);
-            if(cityJobs.length === 0) list.innerHTML = '<p class="text-gray-500 text-center">Наразі вакансій немає.</p>';
-            else cityJobs.forEach(job => {
-                list.innerHTML += `<div class="p-4 bg-white/5 border border-white/5 rounded mb-3 hover:border-accent/30 cursor-pointer transition" onclick="closeCityModal(); openJobModal(${job.id})">
-                    <div class="flex justify-between items-center"><h4 class="font-bold text-white">${job.title}</h4><span class="text-accent text-xs border border-accent/20 px-2 py-1 rounded">Деталі</span></div>
-                    <p class="text-gray-400 text-xs mt-1 truncate">${job.desc}</p></div>`;
-            });
-            modal.classList.add('open');
-        }
-        function closeCityModal() { document.getElementById('cityModal').classList.remove('open'); }
-
-        // --- MODALS ---
+        // --- JOB MODAL ---
         function openJobModal(id) {
             const job = jobs.find(j => j.id === id); if(!job) return;
-            
-            // Set basic info
             document.getElementById('modalIcon').className = `fa-solid ${job.icon} text-6xl text-accent opacity-20`;
             document.getElementById('modalCat').innerText = mapCat(job.cat); 
             document.getElementById('modalCity').innerText = job.city;
             document.getElementById('modalTitle').innerText = job.title; 
             
-            // Set detailed info (with fallback)
-            const data = job.modalData || { 
-                offer: ["ЗП від 30 000 грн", "Офіційне працевлаштування", "Бронювання"], 
-                tasks: ["Виконання виробничих завдань", "Дотримання технологічного процесу"], 
-                candidate: "Відповідальний, пунктуальний, бажає навчатися." 
-            };
+            const data = job.modalData || { offer: [], tasks: [], candidate: "" };
 
             const offerList = document.getElementById('modalOffer');
             offerList.innerHTML = data.offer.map(item => `<li class="flex items-center gap-2"><i class="fa-solid fa-check text-accent text-xs"></i> <span>${item}</span></li>`).join('');
@@ -692,11 +706,8 @@
 
             document.getElementById('modalCandidate').innerText = data.candidate;
             
-            // Заповнення поля для Google Sheets
             const vacancyTitleInput = document.getElementById('modalVacancyTitle');
-            if(vacancyTitleInput) {
-                vacancyTitleInput.value = job.title;
-            }
+            if(vacancyTitleInput) vacancyTitleInput.value = job.title;
 
             document.getElementById('jobModal').classList.add('open');
         }
@@ -744,7 +755,7 @@
 
         // --- UTILS ---
         const observer=new IntersectionObserver((entries)=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('active'); const c=e.target.querySelectorAll('.counter');c.forEach(el=>{const t=+el.getAttribute('data-target');const s=performance.now();const u=(n)=>{const p=Math.min((n-s)/2000,1);el.innerText=Math.floor((1-Math.pow(1-p,3))*t);if(p<1)requestAnimationFrame(u)};requestAnimationFrame(u);}); }})});
-        function mapCat(c) { const m={production:'Виробництво',engineering:'Інженерія',management:'Менеджмент'}; return m[c]||c; }
+        function mapCat(c) { return catMapping[c] || c; }
         function showToast(m) { const t=document.getElementById('toast'); document.getElementById('toastMsg').innerText=m; t.classList.remove('translate-y-40'); setTimeout(()=>t.classList.add('translate-y-40'),3000); }
         function toggleMobileMenu() { document.getElementById('mobile-menu').classList.toggle('open'); }
 
@@ -752,8 +763,7 @@
             resizeCanvas(); 
             initParticles(); 
             animateCanvas(); 
-            renderJobs(); 
-            updateCityCounts(); 
+            initData(); // Replaced individual calls with unified init
             initCharts(); 
             document.querySelectorAll('.reveal').forEach(el => observer.observe(el)); 
         });
