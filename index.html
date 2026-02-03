@@ -358,14 +358,27 @@
                     <h2 class="text-2xl md:text-3xl font-display font-bold text-white uppercase mb-2">Зворотній зв'язок</h2>
                     <p class="text-gray-400 text-sm">Не знайшли потрібну вакансію? Напишіть нам.</p>
                 </div>
-                <form onsubmit="handleFormSubmit(event)" class="space-y-5 max-w-lg mx-auto">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="group"><label class="block text-[10px] font-bold text-gray-500 uppercase mb-2 ml-1">ПІБ</label><input type="text" required class="w-full px-4 py-3 rounded text-sm"></div>
-                        <div class="group"><label class="block text-[10px] font-bold text-gray-500 uppercase mb-2 ml-1">Телефон</label><input type="tel" required class="w-full px-4 py-3 rounded text-sm"></div>
-                    </div>
-                    <div class="group"><label class="block text-[10px] font-bold text-gray-500 uppercase mb-2 ml-1">Місто</label><select class="w-full px-4 py-3 rounded text-sm appearance-none cursor-pointer"><option>Київ</option><option>Львів</option><option>Дніпро</option><option>Інше</option></select></div>
-                    <button type="submit" class="w-full bg-white text-black font-bold font-display uppercase tracking-wider py-4 hover:bg-accent transition-colors mt-2 text-xs md:text-sm">Надіслати анкету</button>
-                </form>
+              <form id="generalContactForm" onsubmit="handleFormSubmit(event)" class="space-y-5 max-w-lg mx-auto">
+    <input type="hidden" name="Vacancy" value="Загальна заявка">
+    <input type="hidden" name="Source" value="ProRecruitment Website">
+    <input type="hidden" name="Candidate_Level" value="Not Specified">
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="group">
+            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 ml-1">ПІБ</label>
+            <input type="text" name="Candidate_Name" required class="w-full px-4 py-3 rounded text-sm bg-black border border-white/10 text-white focus:border-accent outline-none">
+        </div>
+        <div class="group">
+            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 ml-1">Телефон</label>
+            <input type="tel" name="Candidate_Contact" required class="w-full px-4 py-3 rounded text-sm bg-black border border-white/10 text-white focus:border-accent outline-none">
+        </div>
+    </div>
+    <div class="group">
+        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 ml-1">Місто та коментар</label>
+        <textarea name="Candidate_Info" rows="2" placeholder="Вкажіть ваше місто та коротко про досвід" class="w-full px-4 py-3 rounded text-sm bg-black border border-white/10 text-white focus:border-accent outline-none"></textarea>
+    </div>
+    <button type="submit" class="w-full bg-white text-black font-bold font-display uppercase tracking-wider py-4 hover:bg-accent transition-colors mt-2 text-xs md:text-sm">Надіслати анкету</button>
+</form>
             </div>
         </div>
     </section>
@@ -429,16 +442,20 @@
 
                 </div>
                 
-                <form onsubmit="handleJobApply(event)" class="pt-6 border-t border-white/10 bg-black/20 p-4 rounded">
-                    <h4 class="text-white font-bold mb-4 text-sm uppercase tracking-wide">🚀 Бажаєш до команди?</h4>
-                    <input type="hidden" id="modalId">
-                    <div class="space-y-3">
-                        <input type="text" required placeholder="Ваше Ім'я" class="w-full px-4 py-3 rounded text-sm">
-                        <input type="tel" required placeholder="Ваш Телефон" class="w-full px-4 py-3 rounded text-sm">
-                        <button type="submit" class="w-full bg-accent text-black font-bold py-3 hover:bg-white transition-colors uppercase tracking-wide text-xs">Відгукнутись</button>
-                    </div>
-                </form>
-            </div>
+                <form id="jobApplyForm" onsubmit="handleJobApply(event)" class="pt-6 border-t border-white/10 bg-black/20 p-4 rounded">
+    <h4 class="text-white font-bold mb-4 text-sm uppercase tracking-wide">🚀 Бажаєш до команди?</h4>
+    
+    <input type="hidden" name="Vacancy" id="modalVacancyTitle">
+    <input type="hidden" name="Source" value="ProRecruitment Website">
+    <input type="hidden" name="Candidate_Level" value="Specialist">
+    
+    <div class="space-y-3">
+        <input type="text" name="Candidate_Name" required placeholder="Ваше Ім'я" class="w-full px-4 py-3 rounded text-sm bg-black border border-white/10 text-white focus:border-accent outline-none">
+        <input type="tel" name="Candidate_Contact" required placeholder="Ваш Телефон" class="w-full px-4 py-3 rounded text-sm bg-black border border-white/10 text-white focus:border-accent outline-none">
+        <textarea name="Candidate_Info" placeholder="Додаткові коментарі (необов'язково)" class="w-full px-4 py-3 rounded text-sm bg-black border border-white/10 text-white focus:border-accent outline-none"></textarea>
+        <button type="submit" class="w-full bg-accent text-black font-bold py-3 hover:bg-white transition-colors uppercase tracking-wide text-xs">Відгукнутись</button>
+    </div>
+</form>            </div>
         </div>
     </div>
 
@@ -812,6 +829,56 @@
         function toggleMobileMenu() { document.getElementById('mobile-menu').classList.toggle('open'); }
 
         window.addEventListener('DOMContentLoaded', () => { resizeCanvas(); initParticles(); animateCanvas(); loadData(); renderJobs(); initCharts(); document.querySelectorAll('.reveal').forEach(el => observer.observe(el)); });
+        
+        // --- КОНФІГУРАЦІЯ GOOGLE SHEETS ---
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx5CPmFcyDetf7aL6kray9_K82rl9YDCyO0wBF6i0ZXT_KOXeYgAv0Vl78otNvuo6-b/exec'; // ⚠️ Вставте сюди посилання після Deployment
+
+// Функція відправки на Google Apps Script
+async function sendToGoogleSheet(formData) {
+    try {
+        // Додаємо поля, які очікує ваш скрипт (з вашого прикладу)
+        formData.append('Recommender_Name', 'Website Direct');
+        formData.append('Recommender_Signal', 'Direct Form');
+        formData.append('Incognito_Mode', 'No');
+
+        await fetch(GOOGLE_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors', 
+            body: formData
+        });
+        
+        showToast('Заявку успішно відправлено! 🚀');
+    } catch (error) {
+        console.error('Submission Error:', error);
+        showToast('Помилка відправки. Спробуйте пізніше.');
+    }
+}
+
+// Замінюємо ваші старі функції на нові
+function handleFormSubmit(e) {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    sendToGoogleSheet(formData);
+    e.target.reset();
+}
+
+function handleJobApply(e) {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    sendToGoogleSheet(formData);
+    closeJobModal();
+    e.target.reset();
+}
+
+// Модифікуємо функцію відкриття модалки, щоб вона підтягувала назву вакансії
+const originalOpenJobModal = openJobModal;
+openJobModal = function(id) {
+    originalOpenJobModal(id);
+    const job = jobs.find(j => j.id === id);
+    if(job) {
+        document.getElementById('modalVacancyTitle').value = job.title;
+    }
+}
     </script>
 </body>
 </html>
