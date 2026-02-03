@@ -1,18 +1,18 @@
 <!DOCTYPE html>
-<html lang="uk" class="scroll-smooth">
+<html lang="uk">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PRO recruitment | Future Tech</title>
+    <title>Under Construction | PRO Recruitment</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
     <script>
         tailwind.config = {
-            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: {
@@ -20,21 +20,10 @@
                         display: ['Space Grotesk', 'sans-serif'],
                     },
                     colors: {
-                        dark: {
-                            bg: '#050505',
-                            card: '#0a0a0a',
-                            surface: '#121212',
-                            border: '#262626',
-                        },
                         accent: {
                             DEFAULT: '#dbe120',
-                            hover: '#c5cc1c',
-                            dim: 'rgba(219, 225, 32, 0.1)',
                         }
                     },
-                    animation: {
-                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                    }
                 }
             }
         }
@@ -44,10 +33,11 @@
         body {
             background-color: #050505;
             color: #e4e4e7;
-            -webkit-font-smoothing: antialiased;
-            overflow-x: hidden;
+            font-family: 'Inter', sans-serif;
+            overflow: hidden; /* Забороняємо прокрутку */
         }
 
+        /* Сітчастий фон з оригіналу */
         .bg-tech-pattern {
             background-image: 
                 linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
@@ -55,68 +45,132 @@
             background-size: 40px 40px;
         }
 
-        .glass-panel {
-            background: rgba(10, 10, 10, 0.9);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        /* Анімації для шестерень */
+        .spin-slow {
+            animation: spin 12s linear infinite;
+        }
+        .spin-reverse-slow {
+            animation: spinReverse 15s linear infinite;
         }
 
-        .city-card { transition: all 0.3s ease; }
-        .city-card:hover { transform: translateY(-5px); border-color: #dbe120; box-shadow: 0 10px 30px -10px rgba(219, 225, 32, 0.15); }
-        .city-card:hover .city-icon { color: #dbe120; border-color: #dbe120; transform: scale(1.1); }
-
-        .chart-wrapper { position: relative; height: 300px; width: 100%; }
-
-        input, select, textarea {
-            font-size: 16px !important;
-            background-color: #0a0a0a;
-            border: 1px solid #262626;
-            color: white;
-            transition: all 0.3s ease;
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: #dbe120;
-            box-shadow: 0 0 0 1px rgba(219, 225, 32, 0.3);
+        @keyframes spinReverse {
+            from { transform: rotate(360deg); }
+            to { transform: rotate(0deg); }
         }
 
-        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; }
-        .reveal.active { opacity: 1; transform: translateY(0); }
-
-        #hero-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
-
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #050505; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #dbe120; }
-        
-        #mobile-menu { transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out; max-height: 0; opacity: 0; overflow: hidden; }
-        #mobile-menu.open { max-height: 400px; opacity: 1; }
-
-        .modal { display: none; position: fixed; inset: 0; z-index: 100; background-color: rgba(0,0,0,0.95); backdrop-filter: blur(5px); align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease; }
-        .modal.open { display: flex; opacity: 1; }
-        
-        /* Utility classes for toggling views */
-        .view-hidden { display: none !important; }
-        .view-visible { display: block !important; animation: fadeIn 0.5s ease-out; }
-        
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        /* Колір акценту для шестерні */
+        .text-accent {
+            color: #dbe120;
+        }
     </style>
 </head>
-<body class="bg-tech-pattern flex flex-col min-h-screen">
+<body class="bg-tech-pattern min-h-screen flex items-center justify-center relative">
 
-    <nav class="fixed top-0 w-full z-50 glass-panel">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16 md:h-20 items-center">
-                <div class="flex items-center gap-3 z-50 cursor-pointer" onclick="resetToHubs()">
-                    <div class="w-10 h-10 border border-accent/20 bg-accent/5 rounded flex items-center justify-center text-accent font-bold font-display text-xl">P</div>
-                    <div class="flex flex-col">
-                        <span class="font-display font-bold text-lg md:text-xl text-white tracking-wide leading-none">PRO Recruitment</span>
-                        <span class="text-[10px] font-semibold text-gray-500 uppercase tracking-[0.2em] leading-none mt-1">your future job</span>
-                    </div>
-                </div>
-            </div>
+    <canvas id="hero-canvas" class="fixed inset-0 z-0 pointer-events-none"></canvas>
+    
+    <div class="fixed inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,#050505_85%)] z-10 pointer-events-none"></div>
+
+    <div class="relative z-20 flex flex-col items-center justify-center p-6 text-center select-none">
+        <div class="flex justify-center items-center gap-4 mb-8 opacity-80">
+            <i class="fa-solid fa-gear text-7xl md:text-9xl text-accent spin-slow"></i>
+            <i class="fa-solid fa-cog text-5xl md:text-7xl text-gray-600 spin-reverse-slow mt-8"></i>
+        </div>
+
+        <h1 class="text-3xl md:text-5xl font-display font-bold uppercase tracking-[0.2em] text-white mb-4 drop-shadow-lg">
+            Under Construction
+        </h1>
+        <p class="text-gray-400 text-sm md:text-base font-light tracking-wider uppercase">
+            Ми будуємо щось дивовижне. Скоро повернемось.
+        </p>
+
+        <div class="mt-12 opacity-50">
+             <div class="w-10 h-10 border border-accent/20 bg-accent/5 rounded flex items-center justify-center text-accent font-bold font-display text-xl mx-auto">P</div>
         </div>
     </div>
- </body>
+
+
+    <script>
+        const canvas = document.getElementById('hero-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height, particles = [];
+
+        // Налаштування розмірів канвасу
+        function resizeCanvas() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+
+        // Клас частинки
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 0.3; // Швидкість по X
+                this.vy = (Math.random() - 0.5) * 0.3; // Швидкість по Y
+                this.size = Math.random() * 2 + 1;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                // Відбивання від країв екрану
+                if (this.x < 0 || this.x > width) this.vx *= -1;
+                if (this.y < 0 || this.y > height) this.vy *= -1;
+            }
+            draw() {
+                ctx.fillStyle = 'rgba(219,225,32,0.4)'; // Акцентний колір напівпрозорий
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        // Ініціалізація частинок
+        function initParticles() {
+            particles = [];
+            // Кількість частинок залежить від ширини екрану
+            const count = window.innerWidth < 768 ? 30 : 70;
+            for (let i = 0; i < count; i++) particles.push(new Particle());
+        }
+
+        // Головний цикл анімації
+        function animateCanvas() {
+            ctx.clearRect(0, 0, width, height);
+            ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+            ctx.lineWidth = 1;
+
+            for (let i = 0; i < particles.length; i++) {
+                let p1 = particles[i];
+                p1.update();
+                p1.draw();
+                // Малювання ліній між близькими частинками
+                for (let j = i + 1; j < particles.length; j++) {
+                    let p2 = particles[j];
+                    const d = Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2);
+                    if (d < 150) {
+                        ctx.beginPath();
+                        ctx.moveTo(p1.x, p1.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animateCanvas);
+        }
+
+        // Запуск
+        resizeCanvas();
+        initParticles();
+        animateCanvas();
+
+        // Оновлення при зміні розміру вікна
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            initParticles();
+        });
+    </script>
+</body>
 </html>
