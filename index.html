@@ -520,7 +520,7 @@
         <p class="text-xs font-mono uppercase" id="toastMsg">Completed.</p>
     </div>
 
-    <script>
+<script>
         // --- SCROLLING ---
         function scrollToId(id) { const el = document.getElementById(id); if(el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
         function mobileScroll(id) { toggleMobileMenu(); setTimeout(() => scrollToId(id), 300); }
@@ -546,7 +546,6 @@
         window.addEventListener('resize', () => { resizeCanvas(); initParticles(); });
 
         // --- DATA ---
-        // Enhanced data with specific modal content per category/job
         const defaultJobs = [
             { 
                 id: 1, title: "Начальник ВТВ", cat: "management", city: "Kyiv", icon: "fa-user-tie", feat: true, desc: "Керування якістю. Впровадження ISO 9001.",
@@ -731,7 +730,13 @@
 
             document.getElementById('modalCandidate').innerText = data.candidate;
             
-            document.getElementById('modalId').value = job.id; 
+            // --- FIX FOR GOOGLE SHEETS & REMOVED ERROR ---
+            // Ми видалили рядок з modalId, який викликав помилку, і додали заповнення назви вакансії
+            const vacancyTitleInput = document.getElementById('modalVacancyTitle');
+            if(vacancyTitleInput) {
+                vacancyTitleInput.value = job.title;
+            }
+
             document.getElementById('jobModal').classList.add('open');
         }
         function closeJobModal() { document.getElementById('jobModal').classList.remove('open'); }
@@ -755,7 +760,6 @@
         function closeEditForm() { document.getElementById('adminEditForm').classList.add('hidden'); }
         function saveJob() {
             const id=document.getElementById('editId').value;
-            // Preserving current modalData logic for admin adds/edits
             const defaultModalData = { offer: ["ЗП обговорюється", "Бронювання", "Соцпакет"], tasks: ["Згідно посадової інструкції"], candidate: "Досвід роботи вітається" };
             
             let existingData = defaultModalData;
@@ -824,61 +828,46 @@
         const observer=new IntersectionObserver((entries)=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('active'); const c=e.target.querySelectorAll('.counter');c.forEach(el=>{const t=+el.getAttribute('data-target');const s=performance.now();const u=(n)=>{const p=Math.min((n-s)/2000,1);el.innerText=Math.floor((1-Math.pow(1-p,3))*t);if(p<1)requestAnimationFrame(u)};requestAnimationFrame(u);}); }})});
         function mapCat(c) { const m={production:'Виробництво',engineering:'Інженерія',management:'Менеджмент'}; return m[c]||c; }
         function showToast(m) { const t=document.getElementById('toast'); document.getElementById('toastMsg').innerText=m; t.classList.remove('translate-y-40'); setTimeout(()=>t.classList.add('translate-y-40'),3000); }
-        function handleFormSubmit(e) { e.preventDefault(); showToast('Відправлено'); e.target.reset(); }
-        function handleJobApply(e) { e.preventDefault(); closeJobModal(); showToast('Відправлено'); e.target.reset(); }
         function toggleMobileMenu() { document.getElementById('mobile-menu').classList.toggle('open'); }
 
         window.addEventListener('DOMContentLoaded', () => { resizeCanvas(); initParticles(); animateCanvas(); loadData(); renderJobs(); initCharts(); document.querySelectorAll('.reveal').forEach(el => observer.observe(el)); });
-        
-        // --- КОНФІГУРАЦІЯ GOOGLE SHEETS ---
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx5CPmFcyDetf7aL6kray9_K82rl9YDCyO0wBF6i0ZXT_KOXeYgAv0Vl78otNvuo6-b/exec'; // ⚠️ Вставте сюди посилання після Deployment
 
-// Функція відправки на Google Apps Script
-async function sendToGoogleSheet(formData) {
-    try {
-        // Додаємо поля, які очікує ваш скрипт (з вашого прикладу)
-        formData.append('Recommender_Name', 'Website Direct');
-        formData.append('Recommender_Signal', 'Direct Form');
-        formData.append('Incognito_Mode', 'No');
+        // --- GOOGLE SHEETS INTEGRATION ---
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx5CPmFcyDetf7aL6kray9_K82rl9YDCyO0wBF6i0ZXT_KOXeYgAv0Vl78otNvuo6-b/exec'; 
 
-        await fetch(GOOGLE_SCRIPT_URL, {
-            method: 'POST',
-            mode: 'no-cors', 
-            body: formData
-        });
-        
-        showToast('Заявку успішно відправлено! 🚀');
-    } catch (error) {
-        console.error('Submission Error:', error);
-        showToast('Помилка відправки. Спробуйте пізніше.');
-    }
-}
+        async function sendToGoogleSheet(formData) {
+            try {
+                formData.append('Recommender_Name', 'Website Direct');
+                formData.append('Recommender_Signal', 'Direct Form');
+                formData.append('Incognito_Mode', 'No');
 
-// Замінюємо ваші старі функції на нові
-function handleFormSubmit(e) {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    sendToGoogleSheet(formData);
-    e.target.reset();
-}
+                await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', 
+                    body: formData
+                });
+                
+                showToast('Заявку успішно відправлено! 🚀');
+            } catch (error) {
+                console.error('Submission Error:', error);
+                showToast('Помилка відправки.');
+            }
+        }
 
-function handleJobApply(e) {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    sendToGoogleSheet(formData);
-    closeJobModal();
-    e.target.reset();
-}
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            sendToGoogleSheet(formData);
+            e.target.reset();
+        }
 
-// Модифікуємо функцію відкриття модалки, щоб вона підтягувала назву вакансії
-const originalOpenJobModal = openJobModal;
-openJobModal = function(id) {
-    originalOpenJobModal(id);
-    const job = jobs.find(j => j.id === id);
-    if(job) {
-        document.getElementById('modalVacancyTitle').value = job.title;
-    }
-}
+        function handleJobApply(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            sendToGoogleSheet(formData);
+            closeJobModal();
+            e.target.reset();
+        }
     </script>
 </body>
 </html>
