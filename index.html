@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="uk" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PRO recruitment | Future Tech</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif'],
+                    },
+                    colors: {
+                        dark: {
+                            bg: '#050505',
+                            card: '#0a0a0a',
+                            surface: '#121212',
+                            border: '#262626',
+                        },
+                        accent: {
+                            DEFAULT: '#dbe120',
+                            hover: '#c5cc1c',
+                            dim: 'rgba(219, 225, 32, 0.1)',
+                        }
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #050505;
+            color: #e4e4e7;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        .bg-tech-pattern {
+            background-image: 
+                linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        .glass-panel {
+            background: rgba(10, 10, 10, 0.9);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .city-card { transition: all 0.3s ease; }
+        .city-card:hover { transform: translateY(-5px); border-color: #dbe120; box-shadow: 0 10px 30px -10px rgba(219, 225, 32, 0.15); }
+        .city-card:hover .city-icon { color: #dbe120; border-color: #dbe120; transform: scale(1.1); }
+
+        .chart-wrapper { position: relative; height: 300px; width: 100%; }
+
+        input, select, textarea {
+            font-size: 16px !important;
+            background-color: #0a0a0a;
+            border: 1px solid #262626;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #dbe120;
+            box-shadow: 0 0 0 1px rgba(219, 225, 32, 0.3);
+        }
+
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        #hero-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #dbe120; }
+        
+        #mobile-menu { transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out; max-height: 0; opacity: 0; overflow: hidden; }
+        #mobile-menu.open { max-height: 400px; opacity: 1; }
+
+        .modal { display: none; position: fixed; inset: 0; z-index: 100; background-color: rgba(0,0,0,0.95); backdrop-filter: blur(5px); align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease; }
+        .modal.open { display: flex; opacity: 1; }
+    </style>
+</head>
+<body class="bg-tech-pattern flex flex-col min-h-screen">
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 glass-panel">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 md:h-20 items-center">
+                <div class="flex items-center gap-3 z-50 cursor-pointer" onclick="scrollToId('hero')">
+                    <div class="w-10 h-10 border border-accent/20 bg-accent/5 rounded flex items-center justify-center text-accent font-bold font-display text-xl">P</div>
+                    <div class="flex flex-col">
+                        <span class="font-display font-bold text-lg md:text-xl text-white tracking-wide leading-none">PRO Recruitment</span>
+                        <span class="text-[10px] font-semibold text-gray-500 uppercase tracking-[0.2em] leading-none mt-1">your future job</span>
+                    </div>
+                </div>
+                <div class="hidden md:flex space-x-10 text-sm font-medium text-gray-400">
+                    <button onclick="scrollToId('about')" class="hover:text-accent transition-colors uppercase tracking-wider text-xs">Про нас</button>
+                    <button onclick="scrollToId('charts')" class="hover:text-accent transition-colors uppercase tracking-wider text-xs">Аналітика</button>
+                    <button onclick="scrollToId('vacancies')" class="hover:text-accent transition-colors uppercase tracking-wider text-xs">Вакансії</button>
+                </div>
+                <div class="hidden md:block">
+                    <button onclick="scrollToId('contact')" class="px-6 py-2 bg-accent text-black font-bold text-xs uppercase tracking-wider hover:bg-white transition-all duration-300">Зв'язатися</button>
+                </div>
+                <div class="md:hidden z-50">
+                    <button onclick="toggleMobileMenu()" class="text-white p-2"><i id="menu-icon" class="fa-solid fa-bars-staggered text-xl"></i></button>
+                </div>
+            </div>
+        </div>
+        <div id="mobile-menu" class="md:hidden bg-dark-card border-b border-white/10">
+            <div class="px-4 pt-2 pb-6 space-y-1">
+                <button onclick="mobileScroll('about')" class="block w-full text-left px-3 py-4 border-b border-white/5 text-gray-400 hover:text-accent font-display uppercase tracking-wider text-sm">Про нас</button>
+                <button onclick="mobileScroll('charts')" class="block w-full text-left px-3 py-4 border-b border-white/5 text-gray-400 hover:text-accent font-display uppercase tracking-wider text-sm">Аналітика</button>
+                <button onclick="mobileScroll('vacancies')" class="block w-full text-left px-3 py-4 border-b border-white/5 text-gray-400 hover:text-accent font-display uppercase tracking-wider text-sm">Вакансії</button>
+                <button onclick="mobileScroll('contact')" class="w-full text-left mt-4 px-3 py-4 bg-white/5 text-accent font-bold border border-accent/20 font-display uppercase tracking-wider text-sm">Залишити заявку</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <header id="hero" class="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
+        <canvas id="hero-canvas" class="absolute inset-0 z-0"></canvas>
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,#050505_85%)] z-10 pointer-events-none"></div>
+
+        <div class="relative z-20 max-w-7xl mx-auto px-4 text-center sm:text-left w-full reveal">
+            <div class="inline-flex items-center gap-3 px-4 py-2 border border-accent/30 bg-black/60 backdrop-blur-md mb-8 rounded-sm mx-auto sm:mx-0">
+                <span class="w-1.5 h-1.5 bg-accent rounded-full animate-pulse"></span>
+                <span class="text-accent text-xs font-bold uppercase tracking-widest font-display">Набір 2026 Відкрито</span>
+            </div>
+            <h1 class="text-5xl xs:text-6xl md:text-8xl font-display font-bold text-white leading-[0.9] mb-8 uppercase tracking-tighter drop-shadow-2xl">
+                Твоя Робота <br>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-accent to-white">Майбутнього</span>
+            </h1>
+            <p class="text-base md:text-xl text-gray-300 max-w-2xl leading-relaxed mb-10 border-l-2 border-accent/50 pl-6 mx-auto sm:mx-0 text-left bg-black/30 backdrop-blur-sm py-2 pr-4 rounded-r-lg">
+                Ринок праці трансформується. Попит на кваліфікованих технічних фахівців досяг історичного максимуму.
+                Зараз найкращий час капіталізувати свої навички.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center sm:justify-start w-full sm:w-auto">
+                <button onclick="scrollToId('locations')" class="w-full sm:w-auto group px-8 py-4 bg-accent text-black font-bold font-display uppercase tracking-wider hover:bg-white transition-all shadow-[0_0_20px_rgba(219,225,32,0.2)] flex items-center justify-center gap-3">
+                    Обрати місто <i class="fa-solid fa-city"></i>
+                </button>
+                <button onclick="scrollToId('charts')" class="w-full sm:w-auto px-8 py-4 bg-transparent border border-white/20 text-white font-bold font-display uppercase tracking-wider hover:border-accent hover:text-accent transition-colors">
+                    Аналітика ринку
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ABOUT SECTION -->
+    <section id="about" class="py-24 relative bg-dark-bg border-t border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+                
+                <div class="space-y-8 reveal">
+                    <h2 class="text-3xl md:text-5xl font-display font-bold text-white uppercase tracking-tight">
+                        Вітаємо в </br><span class="text-accent">PRO Recruitment</span>
+                    </h2>
+                    
+                    <div class="space-y-6 text-gray-400 font-light text-lg leading-relaxed">
+                        <p>
+                            Ми — ваш стратегічний партнер у кар'єрному зростанні. Наша агенція спеціалізується виключно на підборі експертів для сектору <strong class="text-white">робототехніки та High-Tech промисловості</strong>.
+                        </p>
+                        <p>
+                            В умовах, коли країна відчуває гострий дефіцит виробничіх кадрів, ми розуміємо справжню цінність ваших навичок. Ми співпрацюємо з підприємствами, які будують технологічний щит та майбутнє нашої економіки.
+                        </p>
+                        <p class="border-l-4 border-accent pl-4 text-white font-medium">
+                            Сьогодні ваші знання — це стратегічний ресурс держави. Ми допоможемо реалізувати їх там, де це найбільш потрібно і найкраще оплачується.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="space-y-6 reveal delay-100 flex flex-col justify-center h-full">
+                    <div class="bg-white/5 border border-white/10 rounded-lg p-8 relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-accent opacity-10 rounded-full blur-[50px] group-hover:opacity-20 transition-opacity"></div>
+                        <h4 class="text-2xl font-bold text-white mb-6">Чому PRO?</h4>
+                        <ul class="space-y-4">
+                            <li class="flex items-start">
+                                <div class="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent mr-4 shrink-0 mt-1"><i class="fa-solid fa-check"></i></div>
+                                <div>
+                                    <strong class="text-white block">Перевірені роботодавці</strong>
+                                    <span class="text-gray-500 text-sm">Тільки "білі" компанії з прозорими умовами.</span>
+                                </div>
+                            </li>
+                            <li class="flex items-start">
+                                <div class="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent mr-4 shrink-0 mt-1"><i class="fa-solid fa-check"></i></div>
+                                <div>
+                                    <strong class="text-white block">Повний соціальний пакет</strong>
+                                    <span class="text-gray-500 text-sm">Офіційне працевлаштування, страхування, бронювання.</span>
+                                </div>
+                            </li>
+                            <li class="flex items-start">
+                                <div class="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent mr-4 shrink-0 mt-1"><i class="fa-solid fa-check"></i></div>
+                                <div>
+                                    <strong class="text-white block">Кар'єрний ліфт</strong>
+                                    <span class="text-gray-500 text-sm">Можливість рости від оператора до керівника цеху.</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ANALYTICS SECTION (CHARTS) -->
+    <section id="charts" class="py-24 relative bg-black">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="mb-12 reveal">
+                <h2 class="text-3xl md:text-4xl font-display font-bold text-white uppercase tracking-tight mb-2">Ринок Праці 2025-2026</h2>
+                <p class="text-gray-500">Об'єктивні дані: дефіцит спеціалістів стимулює ріст зарплат.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                
+                <!-- Chart 1: Salary Trends with Switcher -->
+                <div class="glass-panel p-6 md:p-8 border border-white/10 rounded-lg reveal flex flex-col">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                        <h3 class="text-white font-display font-bold uppercase text-sm">Динаміка Зарплат (грн)</h3>
+                        <!-- Chart Controls -->
+                        <div class="flex bg-white/5 rounded p-1">
+                            <button onclick="updateSalaryChart('production')" class="chart-tab px-3 py-1 text-[10px] font-bold uppercase rounded text-black bg-accent transition-colors" id="btn-production">Виробництво</button>
+                            <button onclick="updateSalaryChart('engineering')" class="chart-tab px-3 py-1 text-[10px] font-bold uppercase rounded text-gray-400 hover:text-white transition-colors" id="btn-engineering">Інженерія</button>
+                            <button onclick="updateSalaryChart('management')" class="chart-tab px-3 py-1 text-[10px] font-bold uppercase rounded text-gray-400 hover:text-white transition-colors" id="btn-management">Менеджмент</button>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper flex-1">
+                        <canvas id="salaryChart"></canvas>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-4 text-center">*Дані агреговано з work.ua, robota.ua станом на Січень 2026</p>
+                </div>
+
+                <!-- Chart 2: Talent Deficit -->
+                <div class="glass-panel p-6 md:p-8 border border-white/10 rounded-lg reveal delay-100 flex flex-col">
+                    <div class="flex justify-between items-end mb-6">
+                        <div>
+                            <h3 class="text-white font-display font-bold uppercase text-sm">Дефіцит Кваліфікації</h3>
+                            <p class="text-[10px] text-gray-500 mt-1">Відношення відкритих вакансій до кваліфікованих кандидатів</p>
+                        </div>
+                        <div class="text-xs font-mono text-red-500 animate-pulse">CRITICAL NEED</div>
+                    </div>
+                    <div class="chart-wrapper flex-1">
+                        <canvas id="deficitChart"></canvas>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-4 text-center">Країні бракує саме <span class="text-accent">ваших</span> навичок.</p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- LOCATIONS SECTION -->
+    <section id="locations" class="py-24 relative bg-dark-bg border-t border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 reveal">
+                <h2 class="text-3xl md:text-4xl font-display font-bold text-white uppercase tracking-tight mb-2">Наші Хаби</h2>
+                <p class="text-gray-500">Оберіть місто для перегляду локальних вакансій.</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 reveal delay-100">
+                <div onclick="openCityModal('Kyiv')" class="city-card bg-white/5 border border-white/10 rounded-lg p-6 cursor-pointer flex flex-col items-center text-center group relative overflow-hidden">
+                    <div class="w-16 h-16 bg-black rounded-full flex items-center justify-center mb-4 border border-white/10 group-hover:border-accent transition-colors city-icon"><i class="fa-solid fa-monument text-2xl text-gray-400 transition-colors"></i></div>
+                    <h3 class="text-xl font-bold text-white mb-1">Київ</h3>
+                    <span class="text-xs text-accent uppercase tracking-widest font-bold"><span id="count-kyiv">0</span> Вакансій</span>
+                </div>
+                <div onclick="openCityModal('Lviv')" class="city-card bg-white/5 border border-white/10 rounded-lg p-6 cursor-pointer flex flex-col items-center text-center group relative overflow-hidden">
+                    <div class="w-16 h-16 bg-black rounded-full flex items-center justify-center mb-4 border border-white/10 group-hover:border-accent transition-colors city-icon"><i class="fa-solid fa-mug-hot text-2xl text-gray-400 transition-colors"></i></div>
+                    <h3 class="text-xl font-bold text-white mb-1">Львів</h3>
+                    <span class="text-xs text-accent uppercase tracking-widest font-bold"><span id="count-lviv">0</span> Вакансій</span>
+                </div>
+                <div onclick="openCityModal('Dnipro')" class="city-card bg-white/5 border border-white/10 rounded-lg p-6 cursor-pointer flex flex-col items-center text-center group relative overflow-hidden">
+                    <div class="w-16 h-16 bg-black rounded-full flex items-center justify-center mb-4 border border-white/10 group-hover:border-accent transition-colors city-icon"><i class="fa-solid fa-rocket text-2xl text-gray-400 transition-colors"></i></div>
+                    <h3 class="text-xl font-bold text-white mb-1">Дніпро</h3>
+                    <span class="text-xs text-accent uppercase tracking-widest font-bold"><span id="count-dnipro">0</span> Вакансій</span>
+                </div>
+                <div onclick="openCityModal('Kharkiv')" class="city-card bg-white/5 border border-white/10 rounded-lg p-6 cursor-pointer flex flex-col items-center text-center group relative overflow-hidden">
+                    <div class="w-16 h-16 bg-black rounded-full flex items-center justify-center mb-4 border border-white/10 group-hover:border-accent transition-colors city-icon"><i class="fa-solid fa-atom text-2xl text-gray-400 transition-colors"></i></div>
+                    <h3 class="text-xl font-bold text-white mb-1">Харків</h3>
+                    <span class="text-xs text-accent uppercase tracking-widest font-bold"><span id="count-kharkiv">0</span> Вакансій</span>
+                </div>
+                <div onclick="openCityModal('Odesa')" class="city-card bg-white/5 border border-white/10 rounded-lg p-6 cursor-pointer flex flex-col items-center text-center group relative overflow-hidden">
+                    <div class="w-16 h-16 bg-black rounded-full flex items-center justify-center mb-4 border border-white/10 group-hover:border-accent transition-colors city-icon"><i class="fa-solid fa-anchor text-2xl text-gray-400 transition-colors"></i></div>
+                    <h3 class="text-xl font-bold text-white mb-1">Одеса</h3>
+                    <span class="text-xs text-accent uppercase tracking-widest font-bold"><span id="count-odesa">0</span> Вакансій</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- VACANCIES SECTION -->
+    <section id="vacancies" class="py-24 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 border-b border-white/10 pb-8 gap-6 reveal">
+                <div>
+                    <h2 class="text-3xl md:text-4xl font-display font-bold text-white uppercase tracking-tight mb-2">Всі Вакансії</h2>
+                    <p class="text-gray-500">Натисніть на картку для перегляду умов.</p>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+                    <div class="relative">
+                        <select id="cityFilter" onchange="applyFilters()" class="appearance-none w-full sm:w-48 bg-black border border-white/10 text-white py-2 px-4 pr-8 rounded text-xs font-bold uppercase tracking-wider cursor-pointer hover:border-accent transition-colors">
+                            <option value="all">Всі Міста</option>
+                            <option value="Kyiv">Київ</option>
+                            <option value="Lviv">Львів</option>
+                            <option value="Dnipro">Дніпро</option>
+                            <option value="Kharkiv">Харків</option>
+                            <option value="Odesa">Одеса</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-accent"><i class="fa-solid fa-chevron-down text-xs"></i></div>
+                    </div>
+                    <div class="flex gap-2 overflow-x-auto pb-2 sm:pb-0 scrollbar-hide">
+                        <button onclick="setCategory('all')" class="filter-btn active px-4 py-2 text-xs font-bold uppercase tracking-wider border border-accent bg-accent text-black transition whitespace-nowrap" data-cat="all">Всі</button>
+                        <button onclick="setCategory('production')" class="filter-btn px-4 py-2 text-xs font-bold uppercase tracking-wider border border-white/10 text-gray-400 hover:border-accent hover:text-accent transition whitespace-nowrap" data-cat="production">Виробництво</button>
+                        <button onclick="setCategory('engineering')" class="filter-btn px-4 py-2 text-xs font-bold uppercase tracking-wider border border-white/10 text-gray-400 hover:border-accent hover:text-accent transition whitespace-nowrap" data-cat="engineering">Інженерія</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="job-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Javascript will populate this -->
+            </div>
+            
+            <div id="no-jobs-msg" class="hidden py-20 text-center border border-dashed border-white/10 rounded">
+                <i class="fa-solid fa-layer-group text-4xl text-gray-700 mb-4"></i>
+                <p class="text-gray-500 mt-2">Вакансії за вашим запитом не знайдені.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTACT FORM -->
+    <section id="contact" class="py-24 bg-dark-surface border-t border-white/5 relative overflow-hidden">
+        <div class="max-w-4xl mx-auto px-4 relative z-10 reveal">
+            <div class="glass-panel p-6 md:p-12 border border-white/10 rounded-sm">
+                <div class="text-center mb-10">
+                    <h2 class="text-2xl md:text-3xl font-display font-bold text-white uppercase mb-2">Зворотній зв'язок</h2>
+                    <p class="text-gray-400 text-sm">Не знайшли потрібну вакансію? Напишіть нам.</p>
+                </div>
+                <form onsubmit="handleFormSubmit(event)" class="space-y-5 max-w-lg mx-auto">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="group"><label class="block text-[10px] font-bold text-gray-500 uppercase mb-2 ml-1">ПІБ</label><input type="text" required class="w-full px-4 py-3 rounded text-sm"></div>
+                        <div class="group"><label class="block text-[10px] font-bold text-gray-500 uppercase mb-2 ml-1">Телефон</label><input type="tel" required class="w-full px-4 py-3 rounded text-sm"></div>
+                    </div>
+                    <div class="group"><label class="block text-[10px] font-bold text-gray-500 uppercase mb-2 ml-1">Місто</label><select class="w-full px-4 py-3 rounded text-sm appearance-none cursor-pointer"><option>Київ</option><option>Львів</option><option>Дніпро</option><option>Інше</option></select></div>
+                    <button type="submit" class="w-full bg-white text-black font-bold font-display uppercase tracking-wider py-4 hover:bg-accent transition-colors mt-2 text-xs md:text-sm">Надіслати анкету</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-white/5 py-12 bg-black pb-24 md:pb-12">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex items-center gap-2">
+                <div class="w-5 h-5 bg-accent/20 border border-accent rounded flex items-center justify-center text-accent font-bold text-[10px]">P</div>
+                <span class="text-gray-500 font-bold text-xs tracking-widest uppercase">PRO recruitment © 2026</span>
+            </div>
+            <button onclick="openAdminPanel()" class="text-gray-800 hover:text-accent transition px-4 py-2"><i class="fa-solid fa-lock text-xs"></i></button>
+        </div>
+    </footer>
+
+    <!-- JOB DETAILS MODAL (STRUCTURED) -->
+    <div id="jobModal" class="modal">
+        <div class="modal-content bg-dark-card w-full max-w-2xl mx-4 border border-white/10 shadow-[0_0_50px_rgba(219,225,32,0.1)] relative flex flex-col max-h-[90vh]">
+            
+            <button onclick="closeJobModal()" class="absolute top-4 right-4 text-gray-500 hover:text-accent transition z-20 p-2"><i class="fa-solid fa-xmark text-xl"></i></button>
+            
+            <div class="h-24 bg-white/5 border-b border-white/5 relative overflow-hidden flex items-center justify-center shrink-0">
+                <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#dbe120 1px, transparent 1px); background-size: 10px 10px;"></div>
+                <i id="modalIcon" class="fa-solid fa-microchip text-5xl text-accent opacity-20"></i>
+            </div>
+            
+            <div class="p-6 overflow-y-auto custom-scroll">
+                <div class="flex justify-between items-start mb-4">
+                    <span id="modalCat" class="text-[10px] font-bold uppercase tracking-widest text-accent block">Category</span>
+                    <span id="modalCity" class="text-[10px] font-bold uppercase tracking-widest text-gray-400 block border border-white/10 px-2 py-0.5 rounded">City</span>
+                </div>
+                <h3 id="modalTitle" class="text-2xl font-display font-bold text-white mb-6">Title</h3>
+                
+                <!-- Structured Info -->
+                <div class="space-y-6 mb-8 text-sm">
+                    
+                    <!-- 1. Offer -->
+                    <div class="bg-white/5 p-5 rounded border border-white/5 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-20 h-20 bg-accent/5 rounded-full blur-xl"></div>
+                        <h4 class="text-accent font-bold uppercase mb-3 flex items-center gap-2 text-xs tracking-wider"><i class="fa-solid fa-gift"></i> Що ми пропонуємо</h4>
+                        <ul id="modalOffer" class="space-y-2 text-gray-300 list-none">
+                            <!-- JS Populated -->
+                        </ul>
+                    </div>
+
+                    <!-- 2. Tasks -->
+                    <div>
+                        <h4 class="text-white font-bold uppercase mb-2 text-xs tracking-wider border-b border-white/10 pb-1">Що робити</h4>
+                        <ul id="modalTasks" class="space-y-2 text-gray-400 list-disc pl-4 marker:text-accent">
+                            <!-- JS Populated -->
+                        </ul>
+                    </div>
+
+                    <!-- 3. Candidate -->
+                    <div>
+                        <h4 class="text-white font-bold uppercase mb-2 text-xs tracking-wider border-b border-white/10 pb-1">Ти наш кандидат, якщо</h4>
+                        <p id="modalCandidate" class="text-gray-400 leading-relaxed italic">
+                            <!-- JS Populated -->
+                        </p>
+                    </div>
+
+                </div>
+                
+                <form onsubmit="handleJobApply(event)" class="pt-6 border-t border-white/10 bg-black/20 p-4 rounded">
+                    <h4 class="text-white font-bold mb-4 text-sm uppercase tracking-wide">🚀 Бажаєш до команди?</h4>
+                    <input type="hidden" id="modalId">
+                    <div class="space-y-3">
+                        <input type="text" required placeholder="Ваше Ім'я" class="w-full px-4 py-3 rounded text-sm">
+                        <input type="tel" required placeholder="Ваш Телефон" class="w-full px-4 py-3 rounded text-sm">
+                        <button type="submit" class="w-full bg-accent text-black font-bold py-3 hover:bg-white transition-colors uppercase tracking-wide text-xs">Відгукнутись</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- CITY JOBS MODAL -->
+    <div id="cityModal" class="modal">
+        <div class="modal-content bg-dark-card w-full max-w-2xl mx-4 border border-white/10 shadow-[0_0_50px_rgba(219,225,32,0.1)] relative flex flex-col max-h-[85vh]">
+            <div class="p-6 border-b border-white/10 flex justify-between items-center bg-black/50">
+                <div><h3 class="text-xl font-display font-bold text-white uppercase"><i class="fa-solid fa-location-dot text-accent mr-2"></i> Вакансії: <span id="cityModalName" class="text-accent">City</span></h3></div>
+                <button onclick="closeCityModal()" class="text-gray-500 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="p-6 overflow-y-auto custom-scroll flex-1" id="cityJobList"></div>
+            <div class="p-4 border-t border-white/10 bg-black/50 text-center">
+                <button onclick="closeCityModal(); scrollToId('vacancies')" class="text-xs text-accent hover:underline uppercase tracking-wider">Переглянути всі вакансії</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADMIN MODAL -->
+    <div id="adminModal" class="modal">
+        <div class="modal-content bg-dark-card w-full h-full md:h-auto md:max-w-4xl md:max-h-[90vh] md:mx-4 md:rounded border-none md:border border-white/10 shadow-2xl overflow-hidden flex flex-col text-gray-200">
+            <div class="bg-white/5 p-4 flex justify-between items-center border-b border-white/10 shrink-0">
+                <h3 class="font-display font-bold text-accent uppercase tracking-wider text-sm"><i class="fa-solid fa-terminal mr-2"></i>Admin</h3>
+                <button onclick="closeAdminPanel()" class="text-gray-500 hover:text-white px-2"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div id="adminLogin" class="p-12 text-center grow flex flex-col justify-center items-center">
+                <h4 class="text-white font-bold mb-4">Вхід у систему</h4>
+                <input type="password" id="adminPass" placeholder="Пароль (admin)" class="bg-black text-center text-white w-64 mb-4 px-4 py-3 rounded text-sm">
+                <button onclick="attemptLogin()" class="text-accent hover:text-black border border-accent hover:bg-accent px-8 py-2 rounded text-xs uppercase font-bold transition">Увійти</button>
+            </div>
+            <div id="adminDash" class="hidden grow flex flex-col overflow-hidden relative">
+                <div class="p-4 border-b border-white/10 flex justify-between bg-black/20 shrink-0 items-center">
+                    <span class="text-xs text-gray-500 uppercase tracking-widest">Список</span>
+                    <div class="flex space-x-3">
+                         <button onclick="resetDB()" class="text-xs text-red-500 hover:text-white underline">Скидання</button>
+                         <button onclick="openEditForm()" class="bg-white/10 text-white px-3 py-1 rounded text-xs hover:bg-accent hover:text-black transition flex items-center gap-1"><i class="fa-solid fa-plus"></i> Додати</button>
+                    </div>
+                </div>
+                <div class="overflow-y-auto p-2 space-y-2 custom-scroll grow" id="adminList"></div>
+                <div id="adminEditForm" class="absolute inset-0 bg-dark-card z-20 hidden flex flex-col">
+                    <div class="p-4 border-b border-white/10 flex items-center bg-black/50">
+                        <button onclick="closeEditForm()" class="mr-4 text-gray-500 hover:text-white"><i class="fa-solid fa-arrow-left"></i></button>
+                        <h4 class="font-bold text-white text-sm uppercase" id="formTitle">Редагування</h4>
+                    </div>
+                    <div class="p-6 overflow-y-auto custom-scroll grow space-y-4">
+                        <input type="hidden" id="editId">
+                        <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Назва</label><input type="text" id="editTitle" class="w-full px-3 py-3 text-sm rounded"></div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Місто</label><select id="editCity" class="w-full px-3 py-3 text-sm rounded cursor-pointer"><option value="Kyiv">Київ</option><option value="Lviv">Львів</option><option value="Dnipro">Дніпро</option><option value="Kharkiv">Харків</option><option value="Odesa">Одеса</option></select></div>
+                            <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Категорія</label><select id="editCat" class="w-full px-3 py-3 text-sm rounded cursor-pointer"><option value="production">Виробництво</option><option value="engineering">Інженерія</option><option value="management">Менеджмент</option></select></div>
+                        </div>
+                        <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Короткий опис (картка)</label><textarea id="editDesc" rows="2" class="w-full px-3 py-3 text-sm rounded"></textarea></div>
+                        <button onclick="saveJob()" class="w-full bg-accent text-black font-bold py-3 rounded hover:bg-white transition uppercase text-xs tracking-wider mt-4">Зберегти</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-8 left-1/2 transform -translate-x-1/2 md:left-auto md:right-8 md:translate-x-0 bg-dark-card border border-accent/30 text-white px-6 py-4 translate-y-40 transition-transform duration-300 z-[200] flex items-center shadow-[0_0_20px_rgba(219,225,32,0.1)] w-auto rounded-full">
+        <span class="w-2 h-2 bg-accent rounded-full mr-3 animate-pulse"></span>
+        <p class="text-xs font-mono uppercase" id="toastMsg">Completed.</p>
+    </div>
+
+    <script>
+        // --- SCROLLING ---
+        function scrollToId(id) { const el = document.getElementById(id); if(el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+        function mobileScroll(id) { toggleMobileMenu(); setTimeout(() => scrollToId(id), 300); }
+
+        // --- HERO CANVAS ---
+        const canvas = document.getElementById('hero-canvas'); const ctx = canvas.getContext('2d');
+        let width, height, particles = [];
+        function resizeCanvas() { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; }
+        class Particle {
+            constructor() { this.x = Math.random() * width; this.y = Math.random() * height; this.vx = (Math.random()-0.5)*0.3; this.vy = (Math.random()-0.5)*0.3; this.size = Math.random()*2+1; }
+            update() { this.x+=this.vx; this.y+=this.vy; if(this.x<0||this.x>width)this.vx*=-1; if(this.y<0||this.y>height)this.vy*=-1; }
+            draw() { ctx.fillStyle='rgba(219,225,32,0.4)'; ctx.beginPath(); ctx.arc(this.x,this.y,this.size,0,Math.PI*2); ctx.fill(); }
+        }
+        function initParticles() { particles=[]; const count=window.innerWidth<768?30:70; for(let i=0;i<count;i++) particles.push(new Particle()); }
+        function animateCanvas() {
+            ctx.clearRect(0,0,width,height); ctx.strokeStyle='rgba(255,255,255,0.03)'; ctx.lineWidth=1;
+            for(let i=0;i<particles.length;i++){
+                let p1=particles[i]; p1.update(); p1.draw();
+                for(let j=i+1;j<particles.length;j++){ let p2=particles[j]; const d=Math.sqrt((p1.x-p2.x)**2+(p1.y-p2.y)**2); if(d<150){ctx.beginPath();ctx.moveTo(p1.x,p1.y);ctx.lineTo(p2.x,p2.y);ctx.stroke();} }
+            }
+            requestAnimationFrame(animateCanvas);
+        }
+        window.addEventListener('resize', () => { resizeCanvas(); initParticles(); });
+
+        // --- DATA ---
+        // Enhanced data with specific modal content per category/job
+        const defaultJobs = [
+            { 
+                id: 1, title: "Начальник ВТВ", cat: "management", city: "Kyiv", icon: "fa-user-tie", feat: true, desc: "Керування якістю. Впровадження ISO 9001.",
+                modalData: {
+                    offer: ["ЗП від 60 000 грн + бонуси KPI", "Бронювання та офіційне оформлення", "Службовий транспорт", "Медичне страхування"],
+                    tasks: ["Організація роботи відділу технічного контролю", "Розробка та впровадження стандартів якості", "Аналіз рекламацій та причин браку", "Проведення внутрішніх аудитів"],
+                    candidate: "Маєш досвід керування ВТК від 3 років, знаєш ISO 9001 та вмієш будувати процеси."
+                }
+            },
+            { 
+                id: 2, title: "Програміст ЧПК", cat: "engineering", city: "Lviv", icon: "fa-code", feat: true, desc: "Робота з G-code, Siemens NX, Fanuc.",
+                modalData: {
+                    offer: ["ЗП від 50 000 грн", "Бронювання з першого дня", "Сучасне обладнання (DMG Mori)", "Компенсація житла при переїзді"],
+                    tasks: ["Розробка керуючих програм (токарна/фрезерна група)", "Підбір інструменту та режимів різання", "Впровадження нових деталей у виробництво", "Оптимізація часу обробки"],
+                    candidate: "Знаєш G-code, CAM-системи (NX/SolidCAM) та маєш досвід роботи з металом."
+                }
+            },
+            { 
+                id: 3, title: "Монтажник РЕА", cat: "production", city: "Dnipro", icon: "fa-microchip", feat: true, desc: "Пайка плат, складання вузлів.",
+                modalData: {
+                    offer: ["ЗП від 40 000 грн + виробіток", "Бронювання та соцпакет", "Безкоштовні обіди", "Графік 5/2, 08:00–17:00"],
+                    tasks: ["Пайка SMD компонентів під мікроскопом", "В'язка джгутів та кабельних збірок", "Механічне складання блоків", "Контроль якості пайки"],
+                    candidate: "Маєш «тверду руку», хороший зір та вмієш читати схеми (або хочеш навчитися)."
+                }
+            },
+            { 
+                id: 4, title: "Оператор верстатів", cat: "production", city: "Kharkiv", icon: "fa-industry", feat: false, desc: "Контроль роботи обладнання.",
+                modalData: {
+                    offer: ["ЗП від 35 000 грн", "Бронювання", "Навчання на робочому місці", "Змінний графік 2/2"],
+                    tasks: ["Встановлення заготовок та зняття деталей", "Контроль розмірів мікрометром/штангенциркулем", "Заміна пластин та інструменту", "Підтримка чистоти верстату"],
+                    candidate: "Відповідальний, уважний до деталей та готовий працювати з «залізом»."
+                }
+            },
+            { 
+                id: 5, title: "Інженер-конструктор", cat: "engineering", city: "Kyiv", icon: "fa-robot", feat: false, desc: "Проектування роботизованих систем.",
+                modalData: {
+                    offer: ["ЗП від 55 000 грн", "Бронювання", "Цікаві R&D проекти", "Можливість віддаленої роботи (гібрид)"],
+                    tasks: ["Розробка 3D моделей та креслень (SolidWorks)", "Проектування вузлів автоматизації", "Супровід виготовлення дослідних зразків", "Складання специфікацій"],
+                    candidate: "Маєш вищу технічну освіту та портфоліо проектів у машинобудуванні."
+                }
+            },
+            {
+                id: 6, title: "Логіст", cat: "management", city: "Odesa", icon: "fa-box", feat: false, desc: "Управління складськими запасами.",
+                modalData: {
+                    offer: ["ЗП від 30 000 грн", "Офіційне працевлаштування", "Корпоративний зв'язок"],
+                    tasks: ["Облік приходу/витрат матеріалів в 1С", "Організація адресатного зберігання", "Комплектація замовлень на виробництво", "Проведення інвентаризацій"],
+                    candidate: "Уважний, системний, маєш досвід роботи в складській логістиці."
+                }
+            },
+            {
+                id: 7, title: "Енергетик", cat: "engineering", city: "Dnipro", icon: "fa-bolt", feat: false, desc: "Обслуговування електромереж.",
+                modalData: {
+                    offer: ["ЗП від 45 000 грн", "Бронювання", "Спецодяг та інструмент", "Страхування життя"],
+                    tasks: ["Забезпечення безперебійного електропостачання", "Обслуговування щитових та трансформаторів", "Підключення нового обладнання", "Ведення технічної документації"],
+                    candidate: "Маєш профільну освіту, групу допуску IV-V та досвід на виробництві."
+                }
+            },
+            {
+                id: 8, title: "QA Manager", cat: "management", city: "Lviv", icon: "fa-list-check", feat: false, desc: "Контроль якості продукції.",
+                modalData: {
+                    offer: ["ЗП від 40 000 грн", "Навчання та сертифікація", "Сучасна лабораторія"],
+                    tasks: ["Вхідний контроль матеріалів та комплектуючих", "Міжопераційний контроль на лінії", "Фінальна перевірка виробів", "Оформлення паспортів якості"],
+                    candidate: "Уважний до деталей, принциповий у питаннях якості, вмієш користуватися вимірювальним інструментом."
+                }
+            },
+            {
+                id: 9, title: "Оператор 3D принтера", cat: "production", city: "Kyiv", icon: "fa-cube", feat: true, desc: "Друк прототипів.",
+                modalData: {
+                    offer: ["ЗП від 35 000 грн", "Робота з передовими технологіями", "Гнучкий графік"],
+                    tasks: ["Підготовка моделей до друку (слайсинг)", "Обслуговування принтерів (FDM/SLA)", "Пост-обробка деталей (шліфування, фарбування)", "Контроль витратних матеріалів"],
+                    candidate: "Технічно грамотний, цікавишся адитивними технологіями, готовий навчатися."
+                }
+            },
+            {
+                id: 10, title: "Embedded C++", cat: "engineering", city: "Kharkiv", icon: "fa-microchip", feat: true, desc: "Розробка ПЗ для мікроконтролерів.",
+                modalData: {
+                    offer: ["ЗП від 80 000 грн", "Бронювання", "Relocation package", "Участь у Defense Tech проектах"],
+                    tasks: ["Розробка прошивок для STM32/ESP32", "Робота з інтерфейсами (SPI, I2C, UART, CAN)", "Написання драйверів периферії", "Відлагодження на «залізі»"],
+                    candidate: "Маєш досвід Embedded C/C++, розумієш схемотехніку та принципи RTOS."
+                }
+            }
+        ];
+        let jobs = []; let currentFilter = { cat: 'all', city: 'all' };
+
+        function loadData() {
+            const stored = localStorage.getItem('pro_jobs_final_v3');
+            jobs = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(defaultJobs));
+            if(!stored) persistData();
+            updateCityCounts();
+        }
+        function persistData() { localStorage.setItem('pro_jobs_final_v3', JSON.stringify(jobs)); }
+
+        // --- FILTER & RENDER ---
+        function setCategory(cat) {
+            currentFilter.cat = cat;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                const isActive = btn.getAttribute('data-cat') === cat;
+                btn.className = isActive ? 'filter-btn active px-4 py-2 text-xs font-bold uppercase tracking-wider border border-accent bg-accent text-black transition whitespace-nowrap' : 'filter-btn px-4 py-2 text-xs font-bold uppercase tracking-wider border border-white/10 text-gray-400 hover:border-accent hover:text-accent transition whitespace-nowrap';
+            });
+            renderJobs();
+        }
+        function applyFilters() { currentFilter.city = document.getElementById('cityFilter').value; renderJobs(); }
+        function renderJobs() {
+            const grid = document.getElementById('job-grid');
+            const noMsg = document.getElementById('no-jobs-msg');
+            grid.innerHTML = ''; let count = 0;
+            jobs.forEach(job => {
+                const catMatch = currentFilter.cat === 'all' || job.cat === currentFilter.cat;
+                const cityMatch = currentFilter.city === 'all' || job.city === currentFilter.city;
+                if (catMatch && cityMatch) {
+                    count++;
+                    const card = document.createElement('div');
+                    card.className = 'group relative bg-white/5 border border-white/5 hover:border-accent/50 rounded-lg p-6 transition-all duration-300 hover:bg-white/10 hover:-translate-y-1 cursor-pointer flex flex-col min-h-[220px] reveal';
+                    card.onclick = () => openJobModal(job.id);
+                    card.innerHTML = `
+                        <div class="flex justify-between items-start mb-6">
+                            <i class="fa-solid ${job.icon} text-4xl text-gray-500 group-hover:text-accent transition-colors drop-shadow-[0_0_5px_rgba(219,225,32,0.1)]"></i>
+                            <div class="flex flex-col items-end gap-2">
+                                ${job.feat ? '<span class="text-[10px] font-bold uppercase tracking-widest text-accent border border-accent/30 px-2 py-1 rounded">Hot</span>' : ''}
+                                <span class="text-[10px] text-gray-400 border border-white/10 px-2 py-1 rounded flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> ${job.city}</span>
+                            </div>
+                        </div>
+                        <div class="mb-auto">
+                            <span class="text-[10px] text-gray-500 uppercase tracking-widest mb-1 block">${mapCat(job.cat)}</span>
+                            <h3 class="text-xl font-display font-bold text-white group-hover:text-accent transition-colors">${job.title}</h3>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-white/5 flex items-center justify-between opacity-60 group-hover:opacity-100 transition-opacity">
+                            <span class="text-xs text-gray-400 font-mono">Детальніше</span>
+                            <i class="fa-solid fa-arrow-right text-accent -rotate-45 group-hover:rotate-0 transition-transform"></i>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                }
+            });
+            if(count === 0) noMsg.classList.remove('hidden'); else noMsg.classList.add('hidden');
+            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        }
+
+        // --- CITY LOGIC ---
+        function updateCityCounts() {
+            const counts = {}; jobs.forEach(j => { counts[j.city] = (counts[j.city] || 0) + 1; });
+            ['Kyiv', 'Lviv', 'Dnipro', 'Kharkiv', 'Odesa'].forEach(city => {
+                const el = document.getElementById(`count-${city.toLowerCase()}`); if(el) el.textContent = counts[city] || 0;
+            });
+        }
+        function openCityModal(city) {
+            const modal = document.getElementById('cityModal'); document.getElementById('cityModalName').textContent = city;
+            const list = document.getElementById('cityJobList'); list.innerHTML = '';
+            const cityJobs = jobs.filter(j => j.city === city);
+            if(cityJobs.length === 0) list.innerHTML = '<p class="text-gray-500 text-center">Наразі вакансій немає.</p>';
+            else cityJobs.forEach(job => {
+                list.innerHTML += `<div class="p-4 bg-white/5 border border-white/5 rounded mb-3 hover:border-accent/30 cursor-pointer transition" onclick="closeCityModal(); openJobModal(${job.id})">
+                    <div class="flex justify-between items-center"><h4 class="font-bold text-white">${job.title}</h4><span class="text-accent text-xs border border-accent/20 px-2 py-1 rounded">Деталі</span></div>
+                    <p class="text-gray-400 text-xs mt-1 truncate">${job.desc}</p></div>`;
+            });
+            modal.classList.add('open');
+        }
+        function closeCityModal() { document.getElementById('cityModal').classList.remove('open'); }
+
+        // --- MODALS ---
+        function openJobModal(id) {
+            const job = jobs.find(j => j.id === id); if(!job) return;
+            
+            // Set basic info
+            document.getElementById('modalIcon').className = `fa-solid ${job.icon} text-6xl text-accent opacity-20`;
+            document.getElementById('modalCat').innerText = mapCat(job.cat); 
+            document.getElementById('modalCity').innerText = job.city;
+            document.getElementById('modalTitle').innerText = job.title; 
+            
+            // Set detailed info (with fallback)
+            const data = job.modalData || { 
+                offer: ["ЗП від 30 000 грн", "Офіційне працевлаштування", "Бронювання"], 
+                tasks: ["Виконання виробничих завдань", "Дотримання технологічного процесу"], 
+                candidate: "Відповідальний, пунктуальний, бажає навчатися." 
+            };
+
+            const offerList = document.getElementById('modalOffer');
+            offerList.innerHTML = data.offer.map(item => `<li class="flex items-center gap-2"><i class="fa-solid fa-check text-accent text-xs"></i> <span>${item}</span></li>`).join('');
+
+            const tasksList = document.getElementById('modalTasks');
+            tasksList.innerHTML = data.tasks.map(item => `<li>${item}</li>`).join('');
+
+            document.getElementById('modalCandidate').innerText = data.candidate;
+            
+            document.getElementById('modalId').value = job.id; 
+            document.getElementById('jobModal').classList.add('open');
+        }
+        function closeJobModal() { document.getElementById('jobModal').classList.remove('open'); }
+
+        // --- ADMIN ---
+        function openAdminPanel() { document.getElementById('adminModal').classList.add('open'); }
+        function closeAdminPanel() { document.getElementById('adminModal').classList.remove('open'); }
+        function attemptLogin() { if(document.getElementById('adminPass').value==='admin'){document.getElementById('adminLogin').classList.add('hidden');document.getElementById('adminDash').classList.remove('hidden');renderAdminList();}else alert('Error'); }
+        function renderAdminList() {
+            const list=document.getElementById('adminList'); list.innerHTML='';
+            jobs.forEach(j=>{ list.innerHTML+=`<div class="flex justify-between items-center p-3 bg-white/5 rounded mb-2 border border-white/5"><div><div class="text-sm font-bold text-white">${j.title}</div><div class="text-[10px] text-gray-500">${j.city}</div></div><div><button onclick="editJob(${j.id})" class="text-gray-400 hover:text-white mr-2"><i class="fa-solid fa-pen"></i></button><button onclick="delJob(${j.id})" class="text-red-500 hover:text-white"><i class="fa-solid fa-trash"></i></button></div></div>`; });
+        }
+        function openEditForm() { document.getElementById('editId').value=''; document.getElementById('editTitle').value=''; document.getElementById('adminEditForm').classList.remove('hidden'); }
+        function editJob(id) {
+            const j=jobs.find(x=>x.id===id); if(!j)return;
+            document.getElementById('editId').value=j.id; document.getElementById('editTitle').value=j.title;
+            document.getElementById('editCat').value=j.cat; document.getElementById('editCity').value=j.city;
+            document.getElementById('editDesc').value=j.desc;
+            document.getElementById('adminEditForm').classList.remove('hidden');
+        }
+        function closeEditForm() { document.getElementById('adminEditForm').classList.add('hidden'); }
+        function saveJob() {
+            const id=document.getElementById('editId').value;
+            // Preserving current modalData logic for admin adds/edits
+            const defaultModalData = { offer: ["ЗП обговорюється", "Бронювання", "Соцпакет"], tasks: ["Згідно посадової інструкції"], candidate: "Досвід роботи вітається" };
+            
+            let existingData = defaultModalData;
+            if (id) {
+                const existingJob = jobs.find(x => x.id == id);
+                if (existingJob && existingJob.modalData) existingData = existingJob.modalData;
+            }
+
+            const item={ 
+                id:id?parseInt(id):Date.now(), 
+                title:document.getElementById('editTitle').value, 
+                cat:document.getElementById('editCat').value, 
+                city:document.getElementById('editCity').value, 
+                icon:"fa-circle-check", 
+                desc:document.getElementById('editDesc').value, 
+                modalData: existingData, 
+                feat:false 
+            };
+            if(id){ const idx=jobs.findIndex(x=>x.id==id); jobs[idx]=item; } else jobs.unshift(item);
+            persistData(); renderAdminList(); renderJobs(); updateCityCounts(); closeEditForm(); showToast('Saved');
+        }
+        function delJob(id) { if(confirm('Del?')){ jobs=jobs.filter(x=>x.id!==id); persistData(); renderAdminList(); renderJobs(); updateCityCounts(); } }
+        function resetDB() { if(confirm('Reset?')){ jobs=JSON.parse(JSON.stringify(defaultJobs)); persistData(); renderAdminList(); renderJobs(); updateCityCounts(); } }
+
+        // --- CHARTS & ANALYTICS ---
+        let salaryChartInstance = null;
+        const salaryData = {
+            production: { label: 'Виробничі спеціальності (грн)', data: [25000, 27500, 30000, 32000, 35000, 38000] },
+            engineering: { label: 'Інженерні спеціальності (грн)', data: [35000, 40000, 45000, 50000, 55000, 60000] },
+            management: { label: 'Виробничий менеджмент (грн)', data: [45000, 48000, 52000, 55000, 60000, 65000] }
+        };
+
+        function initCharts() {
+            // Salary
+            const ctx1 = document.getElementById('salaryChart').getContext('2d');
+            salaryChartInstance = new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: ['Q1 2025', 'Q2 2025', 'Q3 2025', 'Q4 2025', 'Q1 2026', 'Q2 2026'],
+                    datasets: [{
+                        label: salaryData.production.label, data: salaryData.production.data,
+                        borderColor: '#dbe120', backgroundColor: (ctx) => {const g=ctx.chart.ctx.createLinearGradient(0,0,0,300);g.addColorStop(0,'rgba(219,225,32,0.2)');g.addColorStop(1,'rgba(219,225,32,0)');return g;},
+                        borderWidth: 2, tension: 0.4, fill: true, pointBackgroundColor:'#000', pointBorderColor:'#dbe120'
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: true, grid: { color: '#222' }, ticks: { color: '#666' } }, x: { grid: { display: false }, ticks: { color: '#666' } } } }
+            });
+            // Deficit
+            new Chart(document.getElementById('deficitChart').getContext('2d'), {
+                type: 'bar',
+                data: { labels: ['Інженерія', 'Виробництво', 'Менеджмент'], datasets: [{ label: 'Попит', data: [90, 85, 40], backgroundColor: '#dbe120', borderRadius: 4 }, { label: 'Пропозиція', data: [30, 45, 60], backgroundColor: '#333', borderRadius: 4 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top', labels: { color: '#888' } } }, scales: { y: { display: false }, x: { grid: { display: false } } } }
+            });
+        }
+
+        function updateSalaryChart(type) {
+            if (!salaryChartInstance) return;
+            salaryChartInstance.data.datasets[0].label = salaryData[type].label;
+            salaryChartInstance.data.datasets[0].data = salaryData[type].data;
+            salaryChartInstance.update();
+            document.querySelectorAll('.chart-tab').forEach(btn => btn.className = "chart-tab px-3 py-1 text-[10px] font-bold uppercase rounded text-gray-400 hover:text-white transition-colors");
+            document.getElementById(`btn-${type}`).className = "chart-tab px-3 py-1 text-[10px] font-bold uppercase rounded text-black bg-accent transition-colors";
+        }
+
+        // --- UTILS ---
+        const observer=new IntersectionObserver((entries)=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('active'); const c=e.target.querySelectorAll('.counter');c.forEach(el=>{const t=+el.getAttribute('data-target');const s=performance.now();const u=(n)=>{const p=Math.min((n-s)/2000,1);el.innerText=Math.floor((1-Math.pow(1-p,3))*t);if(p<1)requestAnimationFrame(u)};requestAnimationFrame(u);}); }})});
+        function mapCat(c) { const m={production:'Виробництво',engineering:'Інженерія',management:'Менеджмент'}; return m[c]||c; }
+        function showToast(m) { const t=document.getElementById('toast'); document.getElementById('toastMsg').innerText=m; t.classList.remove('translate-y-40'); setTimeout(()=>t.classList.add('translate-y-40'),3000); }
+        function handleFormSubmit(e) { e.preventDefault(); showToast('Відправлено'); e.target.reset(); }
+        function handleJobApply(e) { e.preventDefault(); closeJobModal(); showToast('Відправлено'); e.target.reset(); }
+        function toggleMobileMenu() { document.getElementById('mobile-menu').classList.toggle('open'); }
+
+        window.addEventListener('DOMContentLoaded', () => { resizeCanvas(); initParticles(); animateCanvas(); loadData(); renderJobs(); initCharts(); document.querySelectorAll('.reveal').forEach(el => observer.observe(el)); });
+    </script>
+</body>
+</html>
